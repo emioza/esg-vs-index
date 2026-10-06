@@ -1,0 +1,2677 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ESG mot index</title>
+<meta name="description" content="Gymnasiearbete: hur stor är avkastningsskillnaden mellan ESG-fonder och indexfonder 2019–2024?">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap">
+<style>
+/* ==========================================================
+   1. FÄRGER OCH TEMA
+   Alla färger är CSS-variabler. Först ljust läge, sedan mörkt
+   läge (följer datorns inställning). Grönt = ESG, blått = index.
+   ========================================================== */
+:root {
+  color-scheme: light;
+  --bakgrund: #f3f6f2;
+  --yta: #ffffff;
+  --yta-2: #ecf1eb;
+  --linje: #d8e0d8;
+  --linje-stark: #b6c3b8;
+  --text: #142019;
+  --text-2: #435148;
+  --text-3: #66736b;
+  --pa-farg: #ffffff;          /* text ovanpå en färgad platta */
+  --index: #2468c9;            /* blått = indexfonder */
+  --index-ton: #e4edfa;
+  --esg: #1d7a3c;              /* grönt = ESG-fonder */
+  --esg-ton: #e1f1e5;
+  --esg-1: #5aa867;            /* ESG nivå 1–3: ljusare → mörkare grönt */
+  --esg-2: #2b8645;
+  --esg-3: #0f5a29;
+  --battre: #16833a;           /* text: ESG bättre än index */
+  --samre: #c4353a;            /* text: ESG sämre än index */
+  --stapel-battre: #15743a;    /* staplar: olika ljushet så att de går att skilja även vid färgblindhet */
+  --stapel-samre: #e8696b;
+  --varning-bg: #fff2b8;
+  --varning-text: #4a3900;
+  --varning-kant: #e2bd2c;
+  --utkast-bg: #ffe1c9;
+  --utkast-text: #5a2800;
+  --utkast-kant: #ec8a3a;
+  --fokus: #1a5fd0;
+  --radie: 10px;
+  --typsnitt-rubrik: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --typsnitt-text: "Public Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --typsnitt-kod: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bakgrund: #0d1210;
+    --yta: #151c18;
+    --yta-2: #1c2520;
+    --linje: #2a352e;
+    --linje-stark: #3d4c42;
+    --text: #e6ede7;
+    --text-2: #b3bfb6;
+    --text-3: #8d9a91;
+    --pa-farg: #0d1210;
+    --index: #5c9cf2;
+    --index-ton: #16263d;
+    --esg: #4db56d;
+    --esg-ton: #14291b;
+    --esg-1: #3f8b51;
+    --esg-2: #62b877;
+    --esg-3: #a0e0ac;
+    --battre: #4cc26b;
+    --samre: #f06a6d;
+    --stapel-battre: #5fcf80;
+    --stapel-samre: #b8383e;
+    --varning-bg: #3a3007;
+    --varning-text: #ffe07a;
+    --varning-kant: #8c7413;
+    --utkast-bg: #3c220e;
+    --utkast-text: #ffc697;
+    --utkast-kant: #a8571c;
+    --fokus: #7fb2ff;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bakgrund: #0d1210;
+  --yta: #151c18;
+  --yta-2: #1c2520;
+  --linje: #2a352e;
+  --linje-stark: #3d4c42;
+  --text: #e6ede7;
+  --text-2: #b3bfb6;
+  --text-3: #8d9a91;
+  --pa-farg: #0d1210;
+  --index: #5c9cf2;
+  --index-ton: #16263d;
+  --esg: #4db56d;
+  --esg-ton: #14291b;
+  --esg-1: #3f8b51;
+  --esg-2: #62b877;
+  --esg-3: #a0e0ac;
+  --battre: #4cc26b;
+  --samre: #f06a6d;
+  --stapel-battre: #5fcf80;
+  --stapel-samre: #b8383e;
+  --varning-bg: #3a3007;
+  --varning-text: #ffe07a;
+  --varning-kant: #8c7413;
+  --utkast-bg: #3c220e;
+  --utkast-text: #ffc697;
+  --utkast-kant: #a8571c;
+  --fokus: #7fb2ff;
+}
+
+/* ==========================================================
+   2. GRUNDLAYOUT OCH TYPOGRAFI
+   ========================================================== */
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bakgrund);
+  color: var(--text);
+  font-family: var(--typsnitt-text);
+  font-size: 16px;
+  line-height: 1.55;
+}
+.ram { max-width: 1160px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 32px); }
+h1, h2, h3, h4 { font-family: var(--typsnitt-rubrik); line-height: 1.15; margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+h2 { font-size: clamp(1.45rem, 3vw, 1.95rem); }
+h3 { font-size: 1.15rem; }
+h4 { font-size: .95rem; font-family: var(--typsnitt-text); font-weight: 700; letter-spacing: 0; }
+p { margin: 0; }
+a { color: var(--index); text-underline-offset: 3px; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--fokus); outline-offset: 2px; border-radius: 4px; }
+.kod { font-family: var(--typsnitt-kod); font-size: .92em; letter-spacing: .02em; }
+.saknas { color: var(--text-3); font-style: italic; }
+.hjalptext { color: var(--text-3); font-size: .88rem; }
+.overrad { font-size: .78rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
+.visuellt-dold { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+/* Varningsband överst (gul = exempeldata, orange = utkast) */
+.varningsband { background: var(--varning-bg); color: var(--varning-text); border-bottom: 2px solid var(--varning-kant); font-size: .95rem; }
+.varningsband .ram { padding-block: .6rem; display: flex; flex-wrap: wrap; gap: .25rem .75rem; align-items: baseline; }
+.varningsband.utkast { background: var(--utkast-bg); color: var(--utkast-text); border-bottom-color: var(--utkast-kant); }
+.lankknapp { background: none; border: 0; padding: 0; color: inherit; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+
+/* Sidhuvud med frågeställning */
+.topp { border-bottom: 1px solid var(--linje); }
+.topp-inre { padding-block: clamp(20px, 4vw, 40px) clamp(16px, 3vw, 28px); display: grid; gap: .8rem; }
+.topp h1 { font-size: clamp(1.9rem, 5vw, 3.1rem); font-weight: 700; }
+.topp h1 .h1-ar { color: var(--text-3); font-weight: 600; white-space: nowrap; }
+.nyckel { display: inline-flex; gap: .9rem; flex-wrap: wrap; font-size: .85rem; color: var(--text-2); }
+.nyckel span { display: inline-flex; align-items: center; gap: .35rem; }
+.nyckel i { width: .8rem; height: .8rem; border-radius: 3px; display: inline-block; }
+.fragestallning { max-width: 68ch; font-size: 1.02rem; color: var(--text-2); }
+.fragestallning strong { color: var(--text); font-weight: 600; }
+
+/* Flikar för sidans lägen */
+.flikar { background: var(--bakgrund); border-bottom: 1px solid var(--linje); }
+.flikrad { display: flex; gap: .25rem; overflow-x: auto; scrollbar-width: thin; }
+.flikrad a {
+  flex: none; padding: .8rem .85rem .7rem; color: var(--text-2); text-decoration: none; font-weight: 600;
+  border-bottom: 3px solid transparent; white-space: nowrap;
+}
+.flikrad a:hover { color: var(--text); }
+.flikrad a[aria-current="page"] { color: var(--text); border-bottom-color: var(--text); }
+
+/* Reglage för mätperiod */
+.periodrad { background: var(--yta); border-bottom: 1px solid var(--linje); }
+.periodinre { padding-block: .7rem; display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1.4rem; }
+.reglage { display: grid; gap: .1rem; min-width: 150px; flex: 1 1 150px; max-width: 260px; }
+.reglage label { font-size: .85rem; color: var(--text-2); }
+.reglage output { font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+.reglage input { width: 100%; accent-color: var(--text-2); }
+.periodtext { font-size: .88rem; color: var(--text-3); flex: 1 1 220px; }
+
+main { padding-block: clamp(20px, 4vw, 36px) 48px; outline: none; }
+.vy { display: grid; gap: clamp(16px, 2.5vw, 24px); }
+
+/* Paneler, knappar och chips */
+.panel { background: var(--yta); border: 1px solid var(--linje); border-radius: var(--radie); padding: clamp(14px, 2.5vw, 22px); display: grid; gap: .8rem; align-content: start; min-width: 0; }
+.panel-rubrik { display: grid; gap: .2rem; }
+.panel-under { color: var(--text-3); font-size: .9rem; }
+.knapp {
+  display: inline-flex; align-items: center; gap: .4rem; padding: .55rem .95rem; border-radius: 8px;
+  border: 1px solid var(--linje-stark); background: var(--yta); color: var(--text); font-weight: 600; cursor: pointer; text-decoration: none;
+}
+.knapp:hover { background: var(--yta-2); }
+.knapp.primar { background: var(--text); color: var(--yta); border-color: var(--text); }
+.knapp.primar:hover { opacity: .9; }
+.knapp:disabled { opacity: .55; cursor: default; }
+.knapprad { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.chips { display: flex; flex-wrap: wrap; gap: .4rem; }
+.chip { display: inline-flex; align-items: center; gap: .3rem; font-size: .8rem; font-weight: 600; padding: .15rem .55rem; border-radius: 999px; background: var(--yta-2); color: var(--text-2); border: 1px solid var(--linje); }
+.chip-index { background: var(--index-ton); color: var(--text); border-color: transparent; }
+.chip-index::before { content: ""; width: .55rem; height: .55rem; border-radius: 2px; background: var(--index); }
+.chip-esg { background: var(--esg-ton); color: var(--text); border-color: transparent; }
+.chip-esg::before { content: ""; width: 0; height: 0; border-left: .32rem solid transparent; border-right: .32rem solid transparent; border-bottom: .55rem solid var(--esg); }
+.chip-varning { background: var(--varning-bg); color: var(--varning-text); border-color: var(--varning-kant); }
+.vyhuvud { display: flex; flex-wrap: wrap; gap: .8rem 1.2rem; align-items: flex-start; }
+.vyhuvud > div { display: grid; gap: .4rem; flex: 1 1 320px; min-width: 0; }
+.tillbaka { flex: none; }
+
+/* ==========================================================
+   3. STARTSIDAN
+   ========================================================== */
+.ingress { font-size: clamp(1.02rem, 1.6vw, 1.15rem); max-width: 68ch; color: var(--text-2); }
+.lagen { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.lageskort {
+  display: grid; gap: .35rem; align-content: start; padding: 18px; border-radius: var(--radie);
+  background: var(--yta); border: 1px solid var(--linje); color: var(--text); text-decoration: none;
+}
+.lageskort:hover { border-color: var(--linje-stark); background: var(--yta-2); }
+.lageskort h2 { font-size: 1.25rem; }
+.lageskort p { color: var(--text-2); font-size: .93rem; }
+.lageskort .overrad { color: var(--text-3); }
+.lageskort.huvud { border-color: var(--text-2); }
+.resultatlista { display: grid; gap: 0; }
+.resultatrad { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: .3rem 1rem; padding-block: .75rem; border-top: 1px solid var(--linje); align-items: baseline; }
+.resultatrad:first-child { border-top: 0; }
+.resultatrad .varde { font-size: 1.15rem; font-weight: 700; }
+.resultatrad .detalj { grid-column: 1 / -1; font-size: .88rem; color: var(--text-3); }
+@media (max-width: 560px) { .resultatrad { grid-template-columns: minmax(0, 1fr); } }
+.metodlista { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px 24px; margin: 0; }
+.metodlista dt { font-weight: 700; margin-bottom: .2rem; }
+.metodlista dd { margin: 0; color: var(--text-2); font-size: .93rem; }
+.formel { font-family: var(--typsnitt-kod); font-size: .84rem; background: var(--yta-2); padding: .1rem .35rem; border-radius: 4px; overflow-wrap: anywhere; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+
+/* ==========================================================
+   4. LÄGE 1 – SÖK EN FOND
+   ========================================================== */
+.sokform { display: grid; gap: .4rem; max-width: 640px; }
+.sokform label { font-weight: 600; }
+.sokrad { display: flex; gap: .5rem; }
+.sokrad input { flex: 1; min-width: 0; padding: .7rem .85rem; border-radius: 8px; border: 1px solid var(--linje-stark); background: var(--yta); font-size: 1.05rem; }
+.sokresultat { display: grid; gap: .4rem; max-width: 640px; }
+.sokresultat .hjalptext { font-size: .9rem; }
+.fondgrupper { display: grid; gap: 22px; }
+.fondgrupp { display: grid; gap: .6rem; }
+.fondgrupp h3 { font-size: 1.02rem; }
+.fondgrupp h3 .ansvarig { color: var(--text-3); font-weight: 600; font-family: var(--typsnitt-text); font-size: .9rem; }
+.fondknappar { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 8px; }
+.fondknapp {
+  display: flex; align-items: center; gap: .75rem; padding: .65rem .8rem; border-radius: var(--radie);
+  background: var(--yta); border: 1px solid var(--linje); color: var(--text); text-decoration: none; min-width: 0;
+}
+.fondknapp:hover { border-color: var(--linje-stark); }
+.fondknapp.index:hover { background: var(--index-ton); }
+.fondknapp.esg:hover { background: var(--esg-ton); }
+.nrbricka {
+  flex: none; width: 2rem; height: 2rem; display: grid; place-items: center; font-weight: 700; font-size: .92rem;
+  color: var(--pa-farg); background: var(--index); border-radius: 50%; font-variant-numeric: tabular-nums;
+}
+.esg .nrbricka, .nrbricka.esg { background: var(--esg); border-radius: 6px; }
+.fondknapp-text { display: grid; min-width: 0; }
+.fondknapp-namn { font-weight: 600; line-height: 1.3; }
+.fondknapp-typ { font-size: .8rem; color: var(--text-3); }
+
+.fondlayout { display: grid; gap: clamp(14px, 2vw, 20px); grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); grid-template-areas: "graf vad" "tabell fakta" "ai fakta"; align-items: start; }
+.omr-graf { grid-area: graf; } .omr-vad { grid-area: vad; } .omr-tabell { grid-area: tabell; } .omr-fakta { grid-area: fakta; } .omr-ai { grid-area: ai; }
+@media (max-width: 860px) {
+  .fondlayout { grid-template-columns: minmax(0, 1fr); grid-template-areas: "graf" "vad" "tabell" "ai" "fakta"; }
+}
+.faktalista { display: grid; margin: 0; }
+.faktalista > div { display: grid; grid-template-columns: minmax(0, 9.5rem) minmax(0, 1fr); gap: .75rem; padding-block: .5rem; border-top: 1px solid var(--linje); }
+.faktalista > div:first-child { border-top: 0; }
+.faktalista dt { color: var(--text-3); font-size: .88rem; }
+.faktalista dd { margin: 0; overflow-wrap: anywhere; }
+.anmarkning { background: var(--varning-bg); color: var(--varning-text); border-radius: 6px; padding: .45rem .6rem; font-size: .92rem; }
+
+/* ==========================================================
+   5. GRAFER, TABELLER OCH "VAD HÄNDE?"
+   ========================================================== */
+.graf { position: relative; height: clamp(270px, 36vw, 370px); }
+.graf.liten { height: 230px; }
+.graf canvas { cursor: pointer; }
+.graftom { display: grid; place-items: center; text-align: center; min-height: 180px; padding: 1rem; color: var(--text-3); background: var(--yta-2); border-radius: 8px; }
+.graftips {
+  position: absolute; z-index: 5; transform: translateX(-50%); max-width: 220px; pointer-events: none;
+  background: var(--yta); color: var(--text); border: 1px solid var(--linje-stark); border-radius: 8px; padding: .4rem .6rem; font-size: .85rem; line-height: 1.35;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .12);
+}
+.seriefoklaring { display: flex; flex-wrap: wrap; gap: .4rem 1.1rem; margin: 0; padding: 0; list-style: none; font-size: .88rem; color: var(--text-2); }
+.seriefoklaring li { display: inline-flex; align-items: center; gap: .45rem; }
+.seriefoklaring svg { flex: none; overflow: visible; }
+.handelselista { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .3rem .9rem; font-size: .85rem; }
+.handelselista button { background: none; border: 0; padding: .15rem 0; color: var(--text-2); cursor: pointer; display: inline-flex; gap: .4rem; align-items: center; text-align: left; }
+.handelselista button:hover { color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
+.markor { flex: none; width: 1.2rem; height: 1.2rem; border-radius: 50%; display: inline-grid; place-items: center; background: var(--text-2); color: var(--yta); font-size: .7rem; font-weight: 700; }
+.handelse-ar .markor { border-radius: 3px; }
+
+.tabellram { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; font-size: .94rem; }
+caption { text-align: left; font-size: .88rem; color: var(--text-3); padding-bottom: .4rem; }
+th, td { padding: .5rem .6rem; border-bottom: 1px solid var(--linje); text-align: right; white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; padding-left: 0; }
+thead th { font-size: .76rem; text-transform: uppercase; letter-spacing: .05em; color: var(--text-3); font-weight: 600; vertical-align: bottom; }
+thead th .kolnamn { display: block; text-transform: none; letter-spacing: 0; font-weight: 500; font-size: .8rem; color: var(--text-2); white-space: normal; max-width: 16rem; margin-left: auto; }
+tbody tr.vald { background: var(--yta-2); }
+tfoot th, tfoot td { font-weight: 600; border-bottom: 0; }
+tfoot tr:first-child th, tfoot tr:first-child td { border-top: 2px solid var(--linje-stark); }
+tfoot th { font-weight: 600; }
+.antal { color: var(--text-3); font-size: .8rem; margin-left: .25rem; }
+.pos { color: var(--battre); }
+.neg { color: var(--samre); }
+.arknapp {
+  background: none; border: 0; padding: .1rem .35rem; margin-left: -.35rem; border-radius: 4px; font-weight: 600; color: var(--text);
+  cursor: pointer; text-decoration: underline dotted; text-underline-offset: 4px;
+}
+.arknapp:hover { background: var(--yta-2); }
+.fotnot { font-size: .85rem; color: var(--text-3); }
+/* Yahoo-siffra som visas när faktabladssiffran saknas: grå och kursiv, ej kontrollerad */
+td.yahoo { color: var(--text-3); font-style: italic; white-space: normal; }
+.yahoo-not { display: block; font-size: .74rem; }
+.kurslista { list-style: none; margin: 0 0 .2rem; padding: 0; display: grid; gap: .1rem; font-variant-numeric: tabular-nums; }
+.kurslista li { display: flex; justify-content: space-between; gap: 1rem; max-width: 16rem; }
+
+.vad-hande { background: var(--yta-2); border-color: transparent; }
+.vad-hande-topp { display: flex; justify-content: space-between; align-items: center; gap: .5rem; flex-wrap: wrap; }
+.arbladdrare { display: flex; gap: .3rem; }
+.arbladdrare button { background: var(--yta); border: 1px solid var(--linje); border-radius: 6px; padding: .2rem .55rem; cursor: pointer; font-size: .88rem; font-variant-numeric: tabular-nums; }
+.arbladdrare button:disabled { opacity: .4; cursor: default; }
+.arsiffror { display: grid; gap: .3rem; margin: 0; }
+.arsiffror > div { display: flex; justify-content: space-between; gap: 1rem; font-size: .92rem; }
+.arsiffror dt { color: var(--text-2); min-width: 0; }
+.arsiffror dd { margin: 0; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.vad-hande ul { margin: 0; padding-left: 1.1rem; font-size: .93rem; }
+.vad-hande .tom { color: var(--text-3); font-style: italic; font-size: .93rem; }
+
+/* ==========================================================
+   6. LÄGE 2 – JÄMFÖR, OCH LÄGE 3 – GRUPPER
+   ========================================================== */
+.jamforval { display: flex; flex-wrap: wrap; gap: .8rem 1rem; align-items: flex-end; }
+.falt { display: grid; gap: .3rem; flex: 1 1 260px; min-width: 0; }
+.falt label { font-weight: 600; font-size: .92rem; display: inline-flex; gap: .4rem; align-items: center; }
+select, .falt input, .falt textarea { width: 100%; padding: .55rem .65rem; border-radius: 8px; border: 1px solid var(--linje-stark); background: var(--yta); }
+.mot { color: var(--text-3); font-weight: 600; padding-bottom: .6rem; }
+.prick { width: .7rem; height: .7rem; border-radius: 2px; display: inline-block; background: var(--index); }
+.prick.esg { background: var(--esg); border-radius: 0; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.huvudmening { font-size: clamp(1.15rem, 2.4vw, 1.5rem); line-height: 1.35; font-weight: 500; max-width: 60ch; }
+.huvudmening strong { font-weight: 700; }
+.jamforlayout { display: grid; gap: clamp(14px, 2vw, 20px); grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); align-items: start; }
+.jamforlayout > .bred { grid-column: 1 / -1; }
+@media (max-width: 860px) { .jamforlayout { grid-template-columns: minmax(0, 1fr); } }
+.smamultiplar { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
+.smamultiplar h4 { margin-bottom: .3rem; }
+.urval summary { cursor: pointer; font-weight: 600; }
+.urval[open] summary { margin-bottom: .8rem; }
+.urvalgrupper { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+.urvalgrupper fieldset { border: 0; margin: 0; padding: 0; display: grid; gap: .35rem; }
+.urvalgrupper legend { font-weight: 700; margin-bottom: .3rem; padding: 0; }
+.kryss { display: flex; gap: .5rem; align-items: flex-start; font-size: .92rem; cursor: pointer; }
+.kryss input { margin-top: .25rem; accent-color: var(--text-2); }
+
+/* ==========================================================
+   7. DATA-LÄGET (formulär)
+   ========================================================== */
+.datafonder { display: grid; gap: 8px; }
+.datafond { background: var(--yta); border: 1px solid var(--linje); border-radius: var(--radie); }
+.datafond > summary { list-style: none; cursor: pointer; display: flex; gap: .7rem; align-items: center; padding: .65rem .8rem; }
+.datafond > summary::-webkit-details-marker { display: none; }
+.datafond > summary .namn { font-weight: 600; flex: 1; min-width: 0; }
+.datafond > summary .raknare { font-size: .85rem; color: var(--text-3); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.datafond[open] > summary { border-bottom: 1px solid var(--linje); }
+.datainre { padding: 1rem .8rem; display: grid; gap: 1rem; }
+.arsrutnat { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: .6rem; }
+.arsfalt { display: grid; gap: .2rem; }
+.arsfalt label { font-size: .85rem; font-weight: 600; color: var(--text-2); }
+.arsrutnat input { padding: .45rem .5rem; border-radius: 6px; border: 1px solid var(--linje-stark); background: var(--yta); font-variant-numeric: tabular-nums; width: 100%; }
+[aria-invalid="true"] { border-color: var(--samre) !important; outline: 2px solid var(--samre); }
+.felrad { color: var(--samre); font-size: .88rem; font-weight: 600; }
+fieldset.faltgrupp { border: 0; padding: 0; margin: 0; display: grid; gap: .5rem; }
+fieldset.faltgrupp legend { font-weight: 700; padding: 0; margin-bottom: .4rem; }
+.faltrutnat { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: .7rem; }
+.falt textarea { min-height: 4.2rem; resize: vertical; }
+.vaxel { display: flex; gap: .6rem; align-items: flex-start; cursor: pointer; }
+.vaxel input { margin-top: .3rem; width: 1.05rem; height: 1.05rem; accent-color: var(--text-2); }
+.json-ut { width: 100%; min-height: 22rem; font-family: var(--typsnitt-kod); font-size: .82rem; line-height: 1.45; padding: .8rem; border-radius: 8px; border: 1px solid var(--linje-stark); background: var(--yta-2); white-space: pre; overflow: auto; }
+.infoplatta { border-radius: 8px; padding: .6rem .75rem; font-size: .93rem; background: var(--yta-2); }
+.infoplatta.varning { background: var(--varning-bg); color: var(--varning-text); }
+.steglista { margin: 0; padding-left: 1.3rem; display: grid; gap: .3rem; color: var(--text-2); font-size: .93rem; }
+
+/* ==========================================================
+   8. AI-RUTAN OCH SIDFOTEN
+   ========================================================== */
+.ai-svar { white-space: pre-wrap; line-height: 1.6; max-width: 68ch; }
+.ai-svar:empty { display: none; }
+.ai-status { font-size: .88rem; color: var(--text-3); }
+.sidfot { border-top: 1px solid var(--linje); background: var(--yta); }
+.sidfot .ram { padding-block: 22px calc(22px + env(safe-area-inset-bottom, 0px)); display: grid; gap: .35rem; font-size: .88rem; color: var(--text-2); }
+.sidfot .datakalla { color: var(--text-3); }
+</style>
+</head>
+<body>
+
+<!-- ==========================================================
+     SIDHUVUD: varningar, rubrik, frågeställning, flikar, period
+     ========================================================== -->
+<div class="varningsband" id="varning-exempel" role="status" hidden>
+  <div class="ram"><strong>⚠ Exempelversion – siffror ej kontrollerade</strong><span>Avkastningen är inte ifylld och kontrollerad mot faktabladen än.</span></div>
+</div>
+<div class="varningsband utkast" id="varning-utkast" role="status" hidden>
+  <div class="ram"><strong>Utkast visas.</strong><span>Graferna använder siffror från Data-läget som bara finns i den här webbläsaren.</span><button type="button" class="lankknapp" id="stang-utkast">Visa riktiga data igen</button></div>
+</div>
+
+<header class="topp">
+  <div class="ram topp-inre">
+    <p class="overrad">Gymnasiearbete · Hashim, Emir &amp; Ida</p>
+    <h1>ESG-fonder mot indexfonder <span class="h1-ar">2019–2024</span></h1>
+    <p class="fragestallning"><strong>Frågeställning:</strong> Hur stor är avkastningsskillnaden mellan ESG-fonder och indexfonder under perioden 2019–2024, och hur kan en interaktiv hemsida med AI-analys visualisera och förklara skillnaderna?</p>
+    <p class="nyckel" aria-label="Färgnyckel"><span><i style="background: var(--index)"></i>Indexfonder</span><span><i style="background: var(--esg)"></i>ESG-fonder</span><span><i style="background: var(--stapel-battre)"></i>ESG bättre ▲</span><span><i style="background: var(--stapel-samre)"></i>ESG sämre ▼</span></p>
+  </div>
+  <nav class="flikar" aria-label="Sidans lägen">
+    <div class="ram flikrad">
+      <a href="#start" data-ga="start" data-flik="start">Start</a>
+      <a href="#fond" data-ga="fond" data-flik="fond">Sök en fond</a>
+      <a href="#jamfor" data-ga="jamfor" data-flik="jamfor">Jämför</a>
+      <a href="#grupper" data-ga="grupper" data-flik="grupper">Grupper</a>
+      <a href="#data" data-ga="data" data-flik="data">Data</a>
+    </div>
+  </nav>
+  <div class="periodrad" id="periodrad" hidden>
+    <div class="ram periodinre">
+      <div class="reglage">
+        <label for="period-start">Från och med <output id="ut-start" for="period-start">2019</output></label>
+        <input type="range" id="period-start" min="2019" max="2024" step="1" value="2019">
+      </div>
+      <div class="reglage">
+        <label for="period-slut">Till och med <output id="ut-slut" for="period-slut">2024</output></label>
+        <input type="range" id="period-slut" min="2019" max="2024" step="1" value="2024">
+      </div>
+      <p class="periodtext" id="periodtext" aria-live="polite"></p>
+    </div>
+  </div>
+</header>
+
+<main id="huvud" tabindex="-1">
+  <div class="ram">
+
+    <!-- ===== STARTSIDA ===== -->
+    <section id="vy-start" class="vy" aria-labelledby="rubrik-start">
+      <h2 id="rubrik-start" class="visuellt-dold">Start</h2>
+      <p class="ingress">Vi jämför 14 globala aktiefonder: fem indexfonder och nio ESG-fonder i tre nivåer, från mjukt till hårt hållbarhetsfilter. Siffrorna är årsavkastning i procent, i svenska kronor och efter avgifter, som vi har hämtat för hand ur fondernas faktablad.</p>
+      <div class="lagen">
+        <a class="lageskort" href="#fond" data-ga="fond"><span class="overrad">Läge 1</span><h2>Sök en fond</h2><p>Se hur 100 kr har vuxit i en fond, år för år, med fakta och källa.</p></a>
+        <a class="lageskort" href="#jamfor" data-ga="jamfor"><span class="overrad">Läge 2</span><h2>Jämför två fonder</h2><p>Ställ en indexfond mot en ESG-fond. Förvalt: Access Global mot Access Edge Global.</p></a>
+        <a class="lageskort huvud" href="#grupper" data-ga="grupper"><span class="overrad">Läge 3 · huvudresultatet</span><h2>Grupper</h2><p>Snittet för indexfonderna mot ESG nivå 1, 2 och 3, år för år.</p></a>
+        <a class="lageskort" href="#data" data-ga="data"><span class="overrad">Arbetsverktyg</span><h2>Data</h2><p>Skriv in siffror, spara ett utkast och ta fram färdig JSON till datafilen.</p></a>
+      </div>
+      <section class="panel" aria-labelledby="rubrik-resultat">
+        <div class="panel-rubrik">
+          <h2 id="rubrik-resultat" style="font-size: 1.3rem">Huvudresultat 2019–2024</h2>
+          <p class="panel-under">Genomsnittlig årlig avkastning (CAGR) för varje ESG-nivå jämfört med indexfonderna. Ändra perioden i läge 3.</p>
+        </div>
+        <div id="start-resultat" class="resultatlista"></div>
+      </section>
+      <section class="panel" aria-labelledby="rubrik-metod">
+        <h2 id="rubrik-metod" style="font-size: 1.3rem">Så räknar vi</h2>
+        <dl class="metodlista">
+          <div><dt>Värdet av 100 kr</dt><dd>Vi låtsas sätta in 100 kr den 1 januari 2019. Varje år räknar vi <span class="formel">värde = föregående värde × (1 + avkastning / 100)</span>.</dd></div>
+          <div><dt>Snitt per år (CAGR)</dt><dd>Den jämna årliga avkastning som hade gett samma slutvärde: <span class="formel">(slutvärde / 100)^(1 / antal år) − 1</span>.</dd></div>
+          <div><dt>Procentenheter</dt><dd>Skillnaden mellan två procentsatser. 8 % mot 6 % är 2 procentenheter (p.e.), inte 2 %.</dd></div>
+          <div><dt>Saknade siffror</dt><dd>”Saknas” betyder att vi inte har någon siffra. Vi gissar aldrig. En fond som saknar 2019 börjar på 100 kr det första året den har siffror.</dd></div>
+        </dl>
+      </section>
+    </section>
+
+    <!-- ===== LÄGE 1: SÖK EN FOND ===== -->
+    <section id="vy-fond" class="vy" aria-labelledby="rubrik-fond" hidden>
+      <div id="fond-sok" class="vy">
+        <div class="vyhuvud"><div><p class="overrad">Läge 1</p><h2 id="rubrik-fond">Sök en fond</h2></div></div>
+        <form class="sokform" id="sokform" role="search">
+          <label for="sokfalt">Fondens namn eller nummer</label>
+          <div class="sokrad">
+            <input id="sokfalt" type="search" autocomplete="off" spellcheck="false" placeholder="t.ex. hållbar energi, acces edge eller 7" aria-describedby="sokhjalp" aria-controls="sokresultat">
+            <button class="knapp primar" type="submit">Visa</button>
+          </div>
+          <p id="sokhjalp" class="hjalptext">Stavfel, halva namn och fondnummer (”7” eller ”fond 7”) går bra.</p>
+        </form>
+        <div id="sokresultat" class="sokresultat" aria-live="polite"></div>
+        <div id="fondknappar" class="fondgrupper"></div>
+      </div>
+      <div id="fond-detalj" class="vy" hidden></div>
+    </section>
+
+    <!-- ===== LÄGE 2: JÄMFÖR ===== -->
+    <section id="vy-jamfor" class="vy" aria-labelledby="rubrik-jamfor" hidden>
+      <div class="vyhuvud">
+        <button type="button" class="knapp tillbaka" data-tillbaka="start">← Tillbaka</button>
+        <div><p class="overrad">Läge 2</p><h2 id="rubrik-jamfor">Jämför en indexfond och en ESG-fond</h2></div>
+      </div>
+      <form class="jamforval panel" id="jamforval">
+        <div class="falt"><label for="val-index"><span class="prick" aria-hidden="true"></span>Indexfond</label><select id="val-index"></select></div>
+        <span class="mot" aria-hidden="true">mot</span>
+        <div class="falt"><label for="val-esg"><span class="prick esg" aria-hidden="true"></span>ESG-fond</label><select id="val-esg"></select></div>
+      </form>
+      <div id="jamfor-resultat" class="vy"></div>
+    </section>
+
+    <!-- ===== LÄGE 3: GRUPPER ===== -->
+    <section id="vy-grupper" class="vy" aria-labelledby="rubrik-grupper" hidden>
+      <div class="vyhuvud">
+        <button type="button" class="knapp tillbaka" data-tillbaka="start">← Tillbaka</button>
+        <div><p class="overrad">Läge 3 · huvudresultatet</p><h2 id="rubrik-grupper">Indexfonder mot ESG nivå 1, 2 och 3</h2></div>
+      </div>
+      <details class="panel urval" id="grupp-urval-ruta">
+        <summary id="urval-rubrik">Vilka fonder räknas?</summary>
+        <p class="hjalptext">Ta bort en fond för att se hur mycket resultatet beror på urvalet, t.ex. fonder med en anmärkning om jämförbarhet.</p>
+        <div id="grupp-urval" class="urvalgrupper"></div>
+      </details>
+      <div id="grupp-resultat" class="vy"></div>
+    </section>
+
+    <!-- ===== DATA-LÄGET ===== -->
+    <section id="vy-data" class="vy" aria-labelledby="rubrik-data" hidden>
+      <div class="vyhuvud">
+        <button type="button" class="knapp tillbaka" data-tillbaka="start">← Tillbaka</button>
+        <div><p class="overrad">Arbetsverktyg</p><h2 id="rubrik-data">Data – fyll i siffror</h2></div>
+      </div>
+      <div class="panel" id="datainfo"></div>
+      <div class="panel">
+        <label class="vaxel" for="forhandsgranska"><input type="checkbox" id="forhandsgranska"><span><strong>Förhandsgranska utkastet i graferna</strong><br><span class="hjalptext">Visar dina siffror på hela sidan, bara i den här webbläsaren.</span></span></label>
+        <label class="vaxel" for="kontrollerad"><input type="checkbox" id="kontrollerad"><span><strong>Siffrorna är kontrollerade mot faktabladen</strong><br><span class="hjalptext">Sätter ”exempeldata”: false i JSON:en. Den gula varningen försvinner när JSON:en ligger i datafilen (eller direkt om du förhandsgranskar).</span></span></label>
+        <p id="sparstatus" class="hjalptext" aria-live="polite"></p>
+      </div>
+      <div id="dataformular" class="datafonder"></div>
+      <section class="panel" aria-labelledby="rubrik-arsforklaringar">
+        <div class="panel-rubrik"><h3 id="rubrik-arsforklaringar">Våra årsförklaringar</h3><p class="panel-under">Visas i rutan ”Vad hände?” och skickas med till AI:n.</p></div>
+        <div id="arsforklaringar-formular" class="faltrutnat"></div>
+      </section>
+      <section class="panel" aria-labelledby="rubrik-export">
+        <div class="panel-rubrik"><h3 id="rubrik-export">Färdig JSON</h3><p class="panel-under">Klistra in texten i <span class="kod">data/fonder.json</span> och i reservkopian i <span class="kod">index.html</span> (se README).</p></div>
+        <div class="knapprad">
+          <button type="button" class="knapp primar" id="visa-json">Visa JSON</button>
+          <button type="button" class="knapp" id="kopiera-json">Kopiera JSON</button>
+          <button type="button" class="knapp" id="rensa-utkast">Rensa utkast</button>
+        </div>
+        <p id="exportstatus" class="hjalptext" aria-live="polite"></p>
+        <label for="json-ut" class="visuellt-dold">JSON att klistra in</label>
+        <textarea id="json-ut" class="json-ut" readonly spellcheck="false" hidden></textarea>
+      </section>
+    </section>
+
+  </div>
+</main>
+
+<footer class="sidfot">
+  <div class="ram">
+    <p>Historisk avkastning är ingen garanti för framtida avkastning. Detta är ett skolarbete, inte finansiell rådgivning.</p>
+    <p>Byggd med hjälp av AI (Claude). AI-förklaringar är tolkningar och kan innehålla fel.</p>
+    <p class="datakalla" id="datakalla-text"></p>
+  </div>
+</footer>
+
+<!-- ==========================================================
+     RESERVKOPIA AV DATAN
+     Används om data/fonder.json inte går att läsa (t.ex. när man
+     dubbelklickar på index.html). Ska vara samma som data/fonder.json.
+     ========================================================== -->
+<script type="application/json" id="reservdata">
+{
+  "exempeldata": true,
+  "fonder": [
+    {
+      "nr": 1,
+      "id": "avanza-global",
+      "namn": "Avanza Global",
+      "typ": "index",
+      "niva": null,
+      "ansvarig": null,
+      "isin": null,
+      "andelsklass": null,
+      "startdatum": null,
+      "forvaltningsavgift": null,
+      "totalAvgift": null,
+      "sfdr": null,
+      "valuta": null,
+      "avkastningValuta": "SEK",
+      "jamforelseindex": null,
+      "sok": ["avanza global", "avanza", "ava global"],
+      "avkastning": {"2019": null, "2020": null, "2021": null, "2022": null, "2023": null, "2024": null},
+      "kalla": "",
+      "kallaFil": "kallor/avanza-global.pdf",
+      "forklaring": "",
+      "anmarkning": ""
+    },
+    {
+      "nr": 2,
+      "id": "lf-global-indexnara",
+      "namn": "Länsförsäkringar Global Indexnära",
+      "typ": "index",
+      "niva": null,
+      "ansvarig": null,
+      "isin": null,
+      "andelsklass": null,
+      "startdatum": null,
+      "forvaltningsavgift": null,
+      "totalAvgift": null,
+      "sfdr": null,
+      "valuta": null,
+      "avkastningValuta": "SEK",
+      "jamforelseindex": null,
+      "sok": ["länsförsäkringar global", "lf global", "lf indexnära", "global indexnära", "länsförsäkringar"],
+      "avkastning": {"2019": null, "2020": null, "2021": null, "2022": null, "2023": null, "2024": null},
+      "kalla": "",
+      "kallaFil": "kallor/lf-global-indexnara.pdf",
+      "forklaring": "",
+      "anmarkning": "Följer ett Paris-anpassat index sedan maj 2022."
+    },
+    {
+      "nr": 3,
+      "id": "robur-access-global",
+      "namn": "Swedbank Robur Access Global A",
+      "typ": "index",
+      "niva": null,
+      "ansvarig": null,
+      "isin": "SE0007074059",
+      "andelsklass": "A",
+      "startdatum": null,
+      "forvaltningsavgift": null,
+      "totalAvgift": 0.24,
+      "sfdr": null,
+      "valuta": null,
+      "avkastningValuta": "SEK",
+      "jamforelseindex": null,
+      "sok": ["access global", "robur access global", "swedbank access global", "swedbank robur global"],
+      "avkastning": {"2019": null, "2020": null, "2021": null, "2022": null, "2023": null, "2024": null},
+      "kalla": "",
+      "kallaFil": "kallor/robur-access-global.pdf",
+      "forklaring": "",
+      "anmarkning": ""
+    },
+    {
+      "nr": 4,
+      "id": "dnb-global-indeks",
+      "namn": "DNB Global Indeks",
+      "typ": "index",
+      "niva": null,
+      "ansvarig": null,
+      "isin": null,
+      "andelsklass": null,
+      "startdatum": null,
+      "forvaltningsavgift": null,
+      "totalAvgift": null,
+      "sfdr": null,
+      "valuta": null,
+      "avkastningValuta": "SEK",
+      "jamforelseindex": null,
+      "sok": ["dnb global", "dnb indeks", "dnb index", "dnb"],
+      "avkastning": {"2019": null, "2020": null, "2021": null, "2022": null, "2023": null, "2024": null},
+      "kalla": "",
+      "kallaFil": "kallor/dnb-global-indeks.pdf",
+      "forklaring": "",
+      "anmarkning": ""
+    },
+    {
+      "nr": 5,
+      "id": "storebrand-global-all-countries",
+      "namn": "Storebrand Global All Countries",
+      "typ": "index",
+      "niva": null,
+      "ansvarig": null,
+      "isin": null,
+      "andelsklass": null,
+      "startdatum": null,
+      "forvaltningsavgift": null,
+      "totalAvgift": null,
+      "sfdr": null,
+      "valuta": null,
+      "avkastningValuta": "SEK",
+      "jamforelseindex": "MSCI ACWI",
+      "sok": ["storebrand all countries", "global all countries", "all countries", "storebrand acwi"],
+      "avkastning": {"2019": null, "2020": null, "2021": null, "2022": null, "2023": null, "2024": null},
+      "kalla": "",
+      "kallaFil": "kallor/storebrand-global-all-countries.pdf",
+      "forklaring": "",
+      "anmarkning": "Inkluderar tillväxtmarknader (MSCI ACWI) – ej helt jämförbar med de andra indexfonderna."
+    },
+    {
+      "nr": 6,
+      "id": "hb-global-index-criteria",
+      "namn": "Handelsbanken Global Index Criteria",
+      "typ": "esg",
+      "niva": 1,
+      "ansvarig": "Ida",
+      "isin": "SE0011309707",
+      "andelsklass": null,
+      "startdatum": null,
+      "forvaltningsavgift": null,
+      "totalAvgift": null,
+      "sfdr": 9,
+      "valuta": null,
+      "avkastningValuta": "SEK",
+      "jamforelseindex": "Solactive ISS ESG Screened Paris Aligned Global Markets Index",
+      "sok": ["global index criteria", "handelsbanken global index", "hb global index", "hb criteria", "index criteria"],
+      "avkastning": {"2019": null, "2020": null, "2021": null, "2022": null, "2023": null, "2024": null},
+      "kalla": "",
+      "kallaFil": "kallor/hb-global-index-criteria.pdf",
+      "forklaring": "",
+      "anmarkning": ""
+    },
+    {
+      "nr": 7,
+      "id": "robur-access-edge-global",
+      "namn": "Swedbank Robur Access Edge Global A",
+      "typ": "esg",
+      "niva": 1,
+      "ansvarig": "Ida",
+      "isin": "SE0014429353",
+      "andelsklass": "A",
+      "startdatum": null,
+      "forvaltningsavgift": null,
+      "totalAvgift": 0.28,
+      "sfdr": null,
+      "valuta": null,
+      "avkastningValuta": "SEK",
+      "jamforelseindex": null,
+      "sok": ["access edge global", "access edge", "edge global", "robur edge", "swedbank edge"],
+      "avkastning": {"2019": null, "2020": null, "2021": null, "2022": null, "2023": null, "2024": null},
+      "kalla": "",
+      "kallaFil": "kallor/robur-access-edge-global.pdf",
+      "forklaring": "",
+      "anmarkning": "Startade 2020, därför saknas 2019."
+    },
+    {
+      "nr": 8,
+      "id": "spp-storebrand-global-plus",
+      "namn": "SPP / Storebrand Global Plus",
+      "typ": "esg",
+      "niva": 1,
+      "ansvarig": "Ida",
+      "isin": null,
+      "andelsklass": null,
+      "startdatum": null,
+      "forvaltningsavgift": null,
+      "totalAvgift": null,
+      "sfdr": null,
+      "valuta": null,
+      "avkastningValuta": "SEK",
+      "jamforelseindex": null,
+      "sok": ["spp global plus", "storebrand global plus", "global plus", "spp plus", "spp"],
+      "avkastning": {"2019": null, "2020": null, "2021": null, "2022": null, "2023": null, "2024": null},
+      "kalla": "",
+      "kallaFil": "kallor/spp-storebrand-global-plus.pdf",
+      "forklaring": "",
+      "anmarkning": ""
+    },
+    {
+      "nr": 9,
+      "id": "storebrand-global-solutions",
+      "namn": "Storebrand Global Solutions",
+      "typ": "esg",
+      "niva": 2,
+      "ansvarig": "Emir",
+      "isin": null,
+      "andelsklass": null,
+      "startdatum": null,
+      "forvaltningsavgift": null,
+      "totalAvgift": null,
+      "sfdr": null,
+      "valuta": null,
+      "avkastningValuta": "SEK",
+      "jamforelseindex": null,
+      "sok": ["global solutions", "storebrand solutions"],
+      "avkastning": {"2019": null, "2020": null, "2021": null, "2022": null, "2023": null, "2024": null},
+      "kalla": "",
+      "kallaFil": "kallor/storebrand-global-solutions.pdf",
+      "forklaring": "",
+      "anmarkning": ""
+    },
+    {
+      "nr": 10,
+      "id": "proethos",
+      "namn": "Proethos fond",
+      "typ": "esg",
+      "niva": 2,
+      "ansvarig": "Emir",
+      "isin": null,
+      "andelsklass": null,
+      "startdatum": null,
+      "forvaltningsavgift": null,
+      "totalAvgift": null,
+      "sfdr": null,
+      "valuta": null,
+      "avkastningValuta": "SEK",
+      "jamforelseindex": null,
+      "sok": ["proethos", "pro ethos", "proethos fond"],
+      "avkastning": {"2019": null, "2020": null, "2021": null, "2022": null, "2023": null, "2024": null},
+      "kalla": "",
+      "kallaFil": "kallor/proethos.pdf",
+      "forklaring": "",
+      "anmarkning": "Ca 35 % av fonden är nordiska bolag – ej helt jämförbar med rent globala fonder."
+    },
+    {
+      "nr": 11,
+      "id": "nordea-klimat-och-miljo",
+      "namn": "Nordea Klimat och Miljö",
+      "typ": "esg",
+      "niva": 2,
+      "ansvarig": "Emir",
+      "isin": null,
+      "andelsklass": null,
+      "startdatum": null,
+      "forvaltningsavgift": null,
+      "totalAvgift": null,
+      "sfdr": null,
+      "valuta": null,
+      "avkastningValuta": "SEK",
+      "jamforelseindex": null,
+      "sok": ["nordea klimat", "klimat och miljö", "klimat miljö", "nordea miljö"],
+      "avkastning": {"2019": null, "2020": null, "2021": null, "2022": null, "2023": null, "2024": null},
+      "kalla": "",
+      "kallaFil": "kallor/nordea-klimat-och-miljo.pdf",
+      "forklaring": "",
+      "anmarkning": ""
+    },
+    {
+      "nr": 12,
+      "id": "hb-hallbar-energi",
+      "namn": "Handelsbanken Hållbar Energi (A1 SEK)",
+      "typ": "esg",
+      "niva": 3,
+      "ansvarig": "Hashim",
+      "isin": "SE0005965662",
+      "andelsklass": "A1 SEK",
+      "startdatum": "2014-10-08",
+      "forvaltningsavgift": 1.5,
+      "totalAvgift": null,
+      "sfdr": 9,
+      "valuta": "SEK",
+      "avkastningValuta": "SEK",
+      "jamforelseindex": "Solactive ISS ESG Screened Global Markets NTR (jan–jun 2024), S&P Global Clean Energy Net TR (från 1 juli 2024)",
+      "sok": ["hållbar energi", "hallbar energi", "hb energi", "handelsbanken energi"],
+      "avkastning": {"2019": null, "2020": null, "2021": null, "2022": null, "2023": null, "2024": null},
+      "kalla": "",
+      "kallaFil": "kallor/hb-hallbar-energi.pdf",
+      "forklaring": "",
+      "anmarkning": "Bytte jämförelseindex 1 juli 2024."
+    },
+    {
+      "nr": 13,
+      "id": "bnp-clean-energy-solutions",
+      "namn": "BNP Paribas Energy Transition C C (numera BNP Clean Energy Solutions)",
+      "typ": "esg",
+      "niva": 3,
+      "ansvarig": "Hashim",
+      "isin": "LU0823414635",
+      "andelsklass": "C C",
+      "startdatum": "2013-05-17",
+      "forvaltningsavgift": 1.5,
+      "totalAvgift": null,
+      "sfdr": 9,
+      "valuta": "EUR",
+      "avkastningValuta": "EUR",
+      "jamforelseindex": "MSCI AC World (EUR) NR",
+      "sok": ["bnp", "bnp paribas", "energy transition", "clean energy solutions", "bnp clean energy"],
+      "avkastning": {"2019": null, "2020": null, "2021": null, "2022": null, "2023": null, "2024": null},
+      "kalla": "",
+      "kallaFil": "kallor/bnp-clean-energy-solutions.pdf",
+      "forklaring": "",
+      "anmarkning": "Hette tidigare BNP Paribas Energy Transition, heter numera BNP Clean Energy Solutions. Bytte placeringsinriktning 2019."
+    },
+    {
+      "nr": 14,
+      "id": "cb-save-earth-fund",
+      "namn": "CB Save Earth Fund RC SEK",
+      "typ": "esg",
+      "niva": 3,
+      "ansvarig": "Hashim",
+      "isin": null,
+      "andelsklass": "RC SEK",
+      "startdatum": "2018-02-21",
+      "forvaltningsavgift": 1,
+      "totalAvgift": 1.61,
+      "sfdr": 9,
+      "valuta": "SEK",
+      "avkastningValuta": "SEK",
+      "jamforelseindex": null,
+      "sok": ["cb save earth", "save earth", "save earth fund", "cb fond"],
+      "avkastning": {"2019": null, "2020": null, "2021": null, "2022": null, "2023": null, "2024": null},
+      "kalla": "",
+      "kallaFil": "kallor/cb-save-earth-fund.pdf",
+      "forklaring": "",
+      "anmarkning": ""
+    }
+  ],
+  "arsforklaringar": {"2019": "", "2020": "", "2021": "", "2022": "", "2023": "", "2024": ""},
+  "handelser": [
+    {"datum": "2020-03", "text": "Covid-kraschen"},
+    {"datum": "2022-02", "text": "Ryssland invaderar Ukraina"},
+    {"datum": "2022", "text": "Räntehöjningar"},
+    {"datum": "2022-11", "text": "ChatGPT lanseras"},
+    {"datum": "2024-11", "text": "USA-valet"}
+  ]
+}
+</script>
+
+<!-- Chart.js 4 (grafbiblioteket) från cdnjs -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
+
+<script>
+'use strict';
+document.documentElement.lang = 'sv'; // sidans språk (behövs när sidan visas som artifact i claude.ai)
+
+/* ==========================================================
+   1. GRUNDINSTÄLLNINGAR
+   Åren vi mäter, namn på grupperna och hur varje serie ritas.
+   ========================================================== */
+const AR = [2019, 2020, 2021, 2022, 2023, 2024];
+const UTKAST_NYCKEL = 'esg-vs-index:utkast:v2'; // sparar {bas, data}: utkastet + datafilen det utgick från
+const FORHANDS_NYCKEL = 'esg-vs-index:forhandsgranska:v1';
+const MANADER = ['januari', 'februari', 'mars', 'april', 'maj', 'juni', 'juli', 'augusti', 'september', 'oktober', 'november', 'december'];
+const NIVANAMN = { 1: 'mjukt filter', 2: 'medelhårt filter', 3: 'hårt filter' };
+
+// De fyra grupperna i läge 3. "ingar" avgör vilka fonder som hör till gruppen.
+const GRUPPER = [
+  { id: 'index', namn: 'Indexfonder', kort: 'Index', ingar: f => f.typ === 'index' },
+  { id: 'niva1', namn: 'ESG nivå 1 – mjukt filter', kort: 'Nivå 1', ingar: f => f.typ === 'esg' && f.niva === 1 },
+  { id: 'niva2', namn: 'ESG nivå 2 – medelhårt filter', kort: 'Nivå 2', ingar: f => f.typ === 'esg' && f.niva === 2 },
+  { id: 'niva3', namn: 'ESG nivå 3 – hårt filter', kort: 'Nivå 3', ingar: f => f.typ === 'esg' && f.niva === 3 },
+];
+
+// Varje serie har färg + streckmönster + punktform, så att linjerna går att skilja åt även utan färg.
+const STIL = {
+  index: { farg: '--index', streck: [], punkt: 'circle' },
+  niva1: { farg: '--esg-1', streck: [8, 5], punkt: 'triangle' },
+  niva2: { farg: '--esg-2', streck: [2, 4], punkt: 'rect' },
+  niva3: { farg: '--esg-3', streck: [], punkt: 'rectRot' },
+};
+
+// Fältens ordning i datafilen (samma som i README).
+const FALTORDNING = ['nr', 'id', 'namn', 'typ', 'niva', 'ansvarig', 'isin', 'andelsklass', 'startdatum', 'forvaltningsavgift', 'totalAvgift', 'sfdr', 'valuta', 'avkastningValuta', 'jamforelseindex', 'sok', 'avkastning', 'kalla', 'kallaFil', 'forklaring', 'anmarkning'];
+
+// Allt som ändras medan sidan används samlas här.
+const tillstand = {
+  filData: null,          // data från data/fonder.json (eller reservkopian)
+  datakalla: 'fil',       // 'fil' eller 'reserv'
+  reservInaktuell: false, // true om reservkopian skiljer sig från fonder.json
+  utkast: null,           // siffror från Data-läget (localStorage)
+  utkastBas: null,        // datafilen som utkastet utgick från (för att upptäcka nyare siffror i filen)
+  utkastNotis: '',        // meddelande om utkastet har slagits ihop med en nyare datafil
+  senasteJamfor: null,    // senast valda fondpar i läge 2
+  forhandsgranska: false, // visa utkastet i graferna?
+  period: { start: 2019, slut: 2024 },
+  valtAr: null,           // året som visas i "Vad hände?"
+  aktuellHash: 'start',
+  internHistorik: [],     // reserv om webbläsarens historik inte går att använda
+  uteslutna: new Set(),   // fonder som tagits bort i läge 3
+  vadHandeKontext: null,  // vad "Vad hände?"-rutan ska visa siffror för
+  aiPrompt: null,         // funktion som bygger AI-prompten för aktuell vy
+  aiKontroll: null,       // AbortController för ett pågående AI-anrop
+};
+
+/* ==========================================================
+   2. SVENSKT TALFORMAT
+   Komma som decimaltecken och "−" (riktigt minustecken).
+   ========================================================== */
+const talformat = {};
+function avrunda(x, dec) {
+  const f = Math.pow(10, dec);
+  const r = Math.round(x * f) / f;
+  return r === 0 ? 0 : r; // tar bort "minus noll"
+}
+function tal(x, dec = 1, medTecken = false) {
+  if (x === null || x === undefined || !Number.isFinite(x)) return 'saknas';
+  const r = avrunda(x, dec);
+  talformat[dec] = talformat[dec] || new Intl.NumberFormat('sv-SE', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+  const s = talformat[dec].format(Math.abs(r));
+  if (r < 0) return '−' + s;
+  if (medTecken) return (r > 0 ? '+' : '±') + s;
+  return s;
+}
+const arTal = x => typeof x === 'number' && Number.isFinite(x);
+const procent = (x, medTecken = true) => arTal(x) ? tal(x, 1, medTecken) + ' %' : 'saknas';
+const kr = x => arTal(x) ? tal(x, 1) + ' kr' : 'saknas';
+const pe = (x, kort = false) => arTal(x) ? tal(x, 1, true) + (kort ? ' p.e.' : ' procentenheter') : 'saknas';
+// Pil och färg följer det avrundade talet, så att "±0,0" aldrig blir grönt eller rött.
+const pil = x => { if (!arTal(x)) return ''; const r = avrunda(x, 1); return r > 0 ? '▲ ' : r < 0 ? '▼ ' : ''; };
+const klassFor = x => { if (!arTal(x)) return 'saknas'; const r = avrunda(x, 1); return r > 0 ? 'pos' : r < 0 ? 'neg' : ''; };
+
+// Läser ett tal ur datafilen eller formuläret. Tål komma, "−" och %-tecken. Tomt = null, fel = NaN.
+function lasTal(v) {
+  if (v === null || v === undefined) return null;
+  if (typeof v === 'number') return Number.isFinite(v) ? v : null;
+  const s = String(v).trim().replace(/[−–]/g, '-').replace(/\s+/g, '').replace('%', '').replace(',', '.');
+  if (s === '') return null;
+  return /^[+-]?\d+(\.\d+)?$/.test(s) ? parseFloat(s) : NaN;
+}
+function avk(fond, ar) {
+  const v = fond && fond.avkastning ? fond.avkastning[ar] : null;
+  return (typeof v === 'number' && Number.isFinite(v)) ? v : null;
+}
+function datumText(iso) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || '');
+  return m ? `${+m[3]} ${MANADER[+m[2] - 1]} ${m[1]}` : (iso || '');
+}
+// Gör text säker att stoppa in i HTML.
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+const ejIfyllt = '<span class="saknas">ej ifyllt</span>';
+
+/* ==========================================================
+   3. LADDA DATA
+   Försöker läsa data/fonder.json. Går det inte (t.ex. när man
+   dubbelklickar på index.html) används reservkopian ovan.
+   ========================================================== */
+function lasLagrat(nyckel) { try { return localStorage.getItem(nyckel); } catch (e) { return null; } }
+function sparaLagrat(nyckel, varde) {
+  try { if (varde === null) localStorage.removeItem(nyckel); else localStorage.setItem(nyckel, varde); return true; }
+  catch (e) { return false; }
+}
+const klona = x => JSON.parse(JSON.stringify(x));
+
+async function laddaData() {
+  let reserv = null;
+  try { reserv = stada(JSON.parse(document.getElementById('reservdata').textContent)); }
+  catch (e) { console.error('Reservkopian i index.html går inte att läsa:', e); }
+
+  let fil = null;
+  try {
+    // Öppnad genom dubbelklick (file://): webbläsaren tillåter inte fetch, så vi hoppar direkt till reservkopian.
+    if (location.protocol === 'file:') throw new Error('sidan är öppnad som fil');
+    const svar = await fetch('data/fonder.json', { cache: 'no-store' });
+    if (!svar.ok) throw new Error('HTTP ' + svar.status);
+    fil = stada(await svar.json());
+  } catch (e) {
+    console.info('data/fonder.json kunde inte läsas, använder reservkopian.', e.message);
+  }
+
+  if (fil) {
+    tillstand.filData = fil;
+    tillstand.datakalla = 'fil';
+    tillstand.reservInaktuell = !!reserv && stabilJson(fil) !== stabilJson(reserv);
+  } else {
+    tillstand.filData = reserv || stada({});
+    tillstand.datakalla = reserv ? 'reserv' : 'ingen';
+  }
+
+  lasUtkast(lasLagrat(UTKAST_NYCKEL));
+  // Har datafilen fått nya siffror sedan utkastet påbörjades? Slå då ihop, så att
+  // ett gammalt utkast inte skriver över det någon annan i gruppen har lagt in.
+  if (tillstand.utkast && tillstand.utkastBas && stabilJson(tillstand.utkastBas) !== stabilJson(tillstand.filData)) {
+    if (tillstand.datakalla === 'fil') {
+      const { data: ihop, konflikter } = slaIhop(tillstand.utkastBas, tillstand.utkast, tillstand.filData);
+      tillstand.utkast = ihop;
+      tillstand.utkastBas = klona(tillstand.filData);
+      tillstand.utkastNotis = 'data/fonder.json har ändrats sedan utkastet påbörjades. De nya siffrorna från filen har lagts in i utkastet.'
+        + (konflikter.length ? ` Här hade både utkastet och filen ändrats, och utkastets värde behölls – kontrollera: ${konflikter.join(', ')}.` : '');
+      sparaUtkastNu();
+    } else {
+      tillstand.utkastNotis = 'Utkastet utgår från en annan version av datan än den som visas nu (sidan är öppnad som fil). Öppna sidan via en webbserver eller GitHub Pages innan du exporterar.';
+    }
+  }
+  tillstand.forhandsgranska = !!tillstand.utkast && lasLagrat(FORHANDS_NYCKEL) === 'ja';
+}
+// Läser ett sparat utkast ({bas, data}) från localStorage.
+function lasUtkast(text) {
+  tillstand.utkast = null; tillstand.utkastBas = null;
+  if (!text) return;
+  try {
+    const p = JSON.parse(text);
+    tillstand.utkast = stada(p.data);
+    tillstand.utkastBas = p.bas ? stada(p.bas) : null;
+  } catch (e) { tillstand.utkast = null; tillstand.utkastBas = null; }
+}
+// Trevägssammanslagning: ett fält som utkastet inte har ändrat får datafilens nya värde.
+function slaIhop(bas, utkast, fil) {
+  const ut = klona(fil), konflikter = [];
+  const lika = (a, b) => stabilJson(a) === stabilJson(b);
+  const valj = (u, b, f, namn) => {
+    if (lika(u, b)) return f;                 // utkastet har inte ändrat fältet: ta filens värde
+    if (lika(f, b) || lika(u, f)) return u;   // bara utkastet har ändrat fältet
+    konflikter.push(namn); return u;          // båda har ändrat olika: behåll utkastets värde
+  };
+  ut.exempeldata = valj(utkast.exempeldata, bas.exempeldata, fil.exempeldata, 'exempeldata');
+  for (const f of ut.fonder) {
+    const u = utkast.fonder.find(x => x.nr === f.nr), b = bas.fonder.find(x => x.nr === f.nr);
+    if (!u || !b) continue;
+    for (const k of Object.keys(f)) {
+      if (k === 'avkastning') { for (const ar of AR) f.avkastning[ar] = valj(u.avkastning[ar], b.avkastning[ar], f.avkastning[ar], `fond ${f.nr} år ${ar}`); }
+      else if (k in u) f[k] = valj(u[k], b[k], f[k], `fond ${f.nr} ${k}`);
+    }
+  }
+  for (const ar of AR) ut.arsforklaringar[ar] = valj(utkast.arsforklaringar[ar], bas.arsforklaringar[ar], fil.arsforklaringar[ar], `årsförklaring ${ar}`);
+  return { data: ut, konflikter };
+}
+
+// Varningar om orimliga värden i datan (visas i Data-läget).
+const DATAVARNINGAR = new Set();
+
+// Städar upp datan: rätt fältordning, alla år finns, tal är tal.
+function stada(d) {
+  const ut = { exempeldata: d && d.exempeldata === true, fonder: [], arsforklaringar: {}, handelser: [] };
+  for (const f of (d && Array.isArray(d.fonder) ? d.fonder : [])) ut.fonder.push(normaliseraFond(f));
+  ut.fonder.sort((a, b) => (a.nr ?? 99) - (b.nr ?? 99));
+  for (const ar of AR) ut.arsforklaringar[ar] = String((d && d.arsforklaringar && d.arsforklaringar[ar]) ?? '');
+  ut.handelser = (d && Array.isArray(d.handelser) ? d.handelser : [])
+    .filter(h => h && h.datum)
+    .map(h => ({ datum: String(h.datum), text: String(h.text ?? '') }));
+  return ut;
+}
+function normaliseraFond(f) {
+  f = f || {};
+  const ut = {};
+  for (const k of FALTORDNING) ut[k] = f[k] ?? null;
+  ut.sok = Array.isArray(f.sok) ? f.sok.map(String) : [];
+  ut.avkastning = {};
+  for (const ar of AR) {
+    const v = lasTal(f.avkastning ? f.avkastning[ar] : null);
+    ut.avkastning[ar] = Number.isFinite(v) ? v : null;
+    // En fond kan inte förlora mer än 100 %. Ett lägre värde är ett skrivfel och räknas som saknat.
+    if (Number.isFinite(v) && v < -100) {
+      DATAVARNINGAR.add(`Fond ${f.nr ?? '?'}, ${ar}: ${tal(v)} % är lägre än −100 % och räknas som saknad. Rätta siffran.`);
+      ut.avkastning[ar] = null;
+    }
+  }
+  for (const k of ['kalla', 'forklaring', 'anmarkning']) ut[k] = ut[k] === null ? '' : String(ut[k]);
+  for (const k of ['nr', 'niva', 'forvaltningsavgift', 'totalAvgift', 'sfdr']) {
+    if (ut[k] !== null) { const v = lasTal(ut[k]); ut[k] = Number.isFinite(v) ? v : null; }
+  }
+  for (const k of Object.keys(f)) if (!(k in ut)) ut[k] = f[k]; // okända fält behålls
+  return ut;
+}
+// JSON med sorterade nycklar, för att jämföra två dataobjekt.
+function stabilJson(v) {
+  if (Array.isArray(v)) return '[' + v.map(stabilJson).join(',') + ']';
+  if (v && typeof v === 'object') return '{' + Object.keys(v).sort().map(k => JSON.stringify(k) + ':' + stabilJson(v[k])).join(',') + '}';
+  return JSON.stringify(v);
+}
+
+// Den data som sidan visar just nu (utkastet om förhandsgranskning är på).
+function data() { return (tillstand.forhandsgranska && tillstand.utkast) ? tillstand.utkast : tillstand.filData; }
+function fonder() { return data().fonder; }
+function fondNr(nr) { return fonder().find(f => f.nr === nr) || null; }
+function periodAr() { return AR.filter(a => a >= tillstand.period.start && a <= tillstand.period.slut); }
+function gruppFor(f) { return GRUPPER.find(g => g.ingar(f)) || null; }
+function stilFor(f) { return f.typ === 'index' ? STIL.index : (STIL['niva' + f.niva] || { farg: '--esg', streck: [], punkt: 'triangle' }); }
+function typText(f) { return f.typ === 'index' ? 'Indexfond' : `ESG-fond, nivå ${f.niva ?? '?'} (${NIVANAMN[f.niva] || 'nivå ej ifylld'})`; }
+
+// Valutan som avkastningen är angiven i ("avkastningValuta", SEK om inget står).
+// Fonder med siffror i en annan valuta, t.ex. BNP-fonden i EUR, markeras tydligt på sidan.
+const VALUTANAMN = { SEK: 'kronor', EUR: 'euro', NOK: 'norska kronor', USD: 'dollar' };
+function avkValuta(f) { return (f && f.avkastningValuta) || 'SEK'; }
+function utlandsk(f) { return avkValuta(f) !== 'SEK'; }
+function valutaOrd(f) { return VALUTANAMN[avkValuta(f)] || avkValuta(f); }
+function namnMedValuta(f) { return utlandsk(f) ? `${f.namn} (${avkValuta(f)})` : f.namn; }
+function enhetFor(f) { return utlandsk(f) ? avkValuta(f) : 'kr'; } // "100 kr" eller "100 EUR"
+function belopp(x, enhet = 'kr') { return arTal(x) ? tal(x, 1) + (enhet ? ' ' + enhet : '') : 'saknas'; }
+// Yahoo-siffran för ett år (bara som kontroll – används aldrig i grafer eller snitt).
+function yahooAvk(f, ar) {
+  const v = f && f.avkastningYahoo ? lasTal(f.avkastningYahoo[ar]) : null;
+  return Number.isFinite(v) ? v : null;
+}
+// En tabellcell med avkastningen. Saknas faktabladssiffran visas Yahoo-siffran grå, som ej kontrollerad.
+function avkCell(f, ar, medPil = true) {
+  const v = avk(f, ar);
+  if (v !== null) return `<td class="${klassFor(v)}">${medPil ? pil(v) : ''}${procent(v)}</td>`;
+  const y = yahooAvk(f, ar);
+  if (y !== null) return `<td class="yahoo">${procent(y)}<span class="yahoo-not">(Yahoo, ej kontrollerad)</span></td>`;
+  return '<td class="saknas">saknas</td>';
+}
+function typChip(f) {
+  return f.typ === 'index' ? '<span class="chip chip-index">Index</span>' : `<span class="chip chip-esg">ESG nivå ${esc(f.niva ?? '?')}</span>`;
+}
+function arspann(forsta, sista) { return forsta === sista ? String(forsta) : `${forsta}–${sista}`; }
+
+/* ==========================================================
+   4. BERÄKNINGAR
+   kedja():  hur 100 kr växer år för år + totalt + CAGR
+   gemensam(): två serier räknade på bara de år båda har siffror
+   gruppSerie(): snittet per år för en grupp fonder
+   ========================================================== */
+function kedja(avkPerAr, arLista) {
+  const res = { punkter: [], forstaAr: null, sistaAr: null, antalAr: 0, slutvarde: null, total: null, cagr: null, lucka: null, luckor: [], saknasSist: [], varden: {} };
+  const harTal = ar => arTal(avkPerAr[ar]);
+  let i = arLista.findIndex(harTal);
+  if (i === -1) return res;
+  // Alla år som saknas mellan första och sista året med siffror (luckor mitt i).
+  const sista = arLista.length - 1 - [...arLista].reverse().findIndex(harTal);
+  res.luckor = arLista.slice(i, sista + 1).filter(a => !harTal(a));
+  // Serien börjar på 100 kr den 1 januari första året med siffror.
+  let varde = 100;
+  res.forstaAr = arLista[i];
+  res.punkter.push({ x: arLista[i], y: 100, ar: null, avk: null });
+  for (; i < arLista.length; i++) {
+    const ar = arLista[i];
+    if (!harTal(ar)) {
+      // Finns det siffror senare är det en lucka mitt i: då kan vi inte räkna vidare.
+      if (arLista.slice(i + 1).some(harTal)) res.lucka = ar;
+      else res.saknasSist = arLista.slice(i);
+      break;
+    }
+    varde = varde * (1 + avkPerAr[ar] / 100);
+    res.punkter.push({ x: ar + 1, y: varde, ar, avk: avkPerAr[ar] });
+    res.varden[ar] = varde;
+    res.sistaAr = ar;
+    res.antalAr++;
+  }
+  if (res.lucka === null) {
+    res.slutvarde = varde;
+    res.total = (varde / 100 - 1) * 100;
+    res.cagr = (Math.pow(varde / 100, 1 / res.antalAr) - 1) * 100;
+  }
+  return res;
+}
+
+// Räknar två serier på exakt samma år (bara år där båda har siffror).
+function gemensam(avkA, avkB, arLista) {
+  const a = {}, b = {};
+  for (const ar of arLista) {
+    const bada = arTal(avkA[ar]) && arTal(avkB[ar]);
+    a[ar] = bada ? avkA[ar] : null;
+    b[ar] = bada ? avkB[ar] : null;
+  }
+  const ka = kedja(a, arLista), kb = kedja(b, arLista);
+  const diffar = arLista.map(ar => a[ar] !== null ? a[ar] - b[ar] : null).filter(v => v !== null);
+  return {
+    a: ka, b: kb,
+    cagrSkillnad: (arTal(ka.cagr) && arTal(kb.cagr)) ? ka.cagr - kb.cagr : null,
+    aritmetisktSnitt: diffar.length ? diffar.reduce((s, v) => s + v, 0) / diffar.length : null,
+    antalDiffar: diffar.length,
+  };
+}
+
+// Snittet per år för en grupp (lika viktat). Bara fonder med siffror räknas.
+// "uteslutna" = fonder som tagits bort med kryssrutorna i läge 3.
+function gruppSerie(grupp, arLista, uteslutna = tillstand.uteslutna) {
+  const medlemmar = fonder().filter(f => grupp.ingar(f) && !uteslutna.has(f.nr));
+  const avkastning = {}, antal = {};
+  for (const ar of arLista) {
+    const varden = medlemmar.map(f => avk(f, ar)).filter(v => v !== null);
+    antal[ar] = varden.length;
+    avkastning[ar] = varden.length ? varden.reduce((s, v) => s + v, 0) / varden.length : null;
+  }
+  return { grupp, medlemmar, avkastning, antal, kedja: kedja(avkastning, arLista) };
+}
+
+// Text som förklarar vilken period en uträkning gäller.
+function periodNot(k, arLista) {
+  if (!k.antalAr) return '';
+  const delar = [];
+  if (k.forstaAr > arLista[0]) delar.push(`börjar ${k.forstaAr} (${arspann(arLista[0], k.forstaAr - 1)} saknas)`);
+  if (k.lucka !== null) delar.push(`${k.luckor.join(', ')} saknas mitt i perioden, därför kan totalt och snitt inte räknas ut`);
+  else if (k.saknasSist.length) delar.push(`${arspann(k.saknasSist[0], k.saknasSist[k.saknasSist.length - 1])} saknas`);
+  return delar.join('; ');
+}
+
+/* ==========================================================
+   5. SÖKNING
+   Tål stavfel: gemener, å/ä/ö → a/a/o, början av ord och
+   Levenshtein-avstånd (hur många bokstäver som skiljer).
+   ========================================================== */
+function normalisera(s) {
+  return String(s ?? '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+}
+function levenshtein(a, b) {
+  const rad = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    let fore = rad[0];
+    rad[0] = i;
+    for (let j = 1; j <= b.length; j++) {
+      const tmp = rad[j];
+      rad[j] = Math.min(rad[j] + 1, rad[j - 1] + 1, fore + (a[i - 1] === b[j - 1] ? 0 : 1));
+      fore = tmp;
+    }
+  }
+  return rad[b.length];
+}
+// Hur bra ett sökord matchar ett ord i fondnamnet (0 = inte alls, 1 = exakt).
+function ordPoang(q, ord) {
+  if (ord === q) return 1;
+  if (q.length >= 2 && ord.startsWith(q)) return 0.9;
+  const tillatet = q.length >= 7 ? 2 : q.length >= 4 ? 1 : 0;
+  if (!tillatet) return 0;
+  if (levenshtein(q, ord) <= tillatet) return 0.75;
+  if (ord.length > q.length && levenshtein(q, ord.slice(0, q.length)) <= 1) return 0.6;
+  return 0;
+}
+function sokFonder(fraga) {
+  const q = normalisera(fraga);
+  if (!q) return [];
+  const nrTraff = /^(?:fond|nr|nummer|fondnr|fond nr)?\s*(\d{1,2})$/.exec(q);
+  if (nrTraff) {
+    const f = fondNr(parseInt(nrTraff[1], 10));
+    return f ? [{ fond: f, poang: 10 }] : [];
+  }
+  if (q.length < 2) return [];
+  const qOrd = q.split(' ');
+  const traffar = [];
+  for (const f of fonder()) {
+    let basta = 0;
+    for (const kandidat of [f.namn, ...f.sok]) {
+      const k = normalisera(kandidat);
+      if (!k) continue;
+      let p;
+      if (k.includes(q)) p = 2 + (k.startsWith(q) ? 0.5 : 0);
+      else {
+        const kOrd = k.split(' ');
+        const poang = qOrd.map(qo => Math.max(0, ...kOrd.map(ko => ordPoang(qo, ko))));
+        p = poang.reduce((s, x) => s + x, 0) / qOrd.length;
+      }
+      basta = Math.max(basta, p);
+    }
+    if (basta >= 0.6) traffar.push({ fond: f, poang: basta });
+  }
+  return traffar.sort((a, b) => b.poang - a.poang || a.fond.nr - b.fond.nr);
+}
+
+/* ==========================================================
+   6. GRAFER (Chart.js)
+   Egna små tillägg (plugins) ritar årsgränser, markerat år,
+   händelsemarkörer, 100 kr-linjen och etiketter på staplarna.
+   ========================================================== */
+const diagram = {};
+const harChart = () => typeof window.Chart !== 'undefined';
+const rorelseAv = () => window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+function farg(namn) { return getComputedStyle(document.documentElement).getPropertyValue(namn).trim(); }
+function tonad(hex, alfa) {
+  const m = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex);
+  return m ? `rgba(${parseInt(m[1], 16)}, ${parseInt(m[2], 16)}, ${parseInt(m[3], 16)}, ${alfa})` : hex;
+}
+function temaFarger() {
+  return {
+    yta: farg('--yta'), text: farg('--text'), text2: farg('--text-2'), text3: farg('--text-3'),
+    grid: farg('--linje'), axel: farg('--linje-stark'), battre: farg('--stapel-battre'), samre: farg('--stapel-samre'),
+  };
+}
+function forstorDiagram(id) { if (diagram[id]) { diagram[id].destroy(); delete diagram[id]; } }
+function forstorAllaDiagram() { for (const id of Object.keys(diagram)) forstorDiagram(id); }
+function tooltipStil(f) {
+  return {
+    backgroundColor: f.yta, titleColor: f.text, bodyColor: f.text2, borderColor: f.axel, borderWidth: 1,
+    padding: 10, cornerRadius: 8, boxPadding: 4, usePointStyle: true, titleFont: { weight: '600' },
+  };
+}
+// Randigt mönster för händelser som gäller ett helt år (t.ex. "2022 Räntehöjningar").
+function randMonster(fargStr) {
+  const c = document.createElement('canvas');
+  c.width = c.height = 8;
+  const x = c.getContext('2d');
+  x.strokeStyle = fargStr; x.lineWidth = 1;
+  x.beginPath(); x.moveTo(0, 8); x.lineTo(8, 0); x.stroke();
+  return x.createPattern(c, 'repeat');
+}
+
+// Händelser från datafilen, med position på tidsaxeln (år + månad/12).
+function tolkaHandelse(h) {
+  const m = /^(\d{4})(?:-(\d{1,2}))?/.exec(h.datum || '');
+  if (!m) return null;
+  const ar = +m[1], manad = m[2] ? +m[2] : null;
+  const heltAr = manad === null || manad < 1 || manad > 12;
+  return {
+    ar, heltAr, text: h.text,
+    x: heltAr ? ar + 0.5 : ar + (manad - 1) / 12 + 1 / 24,
+    datumText: heltAr ? `${ar} (hela året)` : `${MANADER[manad - 1]} ${ar}`,
+  };
+}
+function handelserIPeriod(arLista) {
+  const start = arLista[0], slut = arLista[arLista.length - 1] + 1;
+  return data().handelser.map(tolkaHandelse).filter(h => h && h.x >= start && h.x < slut).sort((a, b) => a.x - b.x);
+}
+function handelselistaHtml(arLista) {
+  const lista = handelserIPeriod(arLista);
+  if (!lista.length) return '';
+  return `<ol class="handelselista" aria-label="Händelser i grafen">${lista.map((h, i) =>
+    `<li class="${h.heltAr ? 'handelse-ar' : ''}"><button type="button" data-valj-ar="${h.ar}"><span class="markor" aria-hidden="true">${i + 1}</span>${esc(h.datumText)} – ${esc(h.text)}</button></li>`).join('')}</ol>`;
+}
+
+// Tillägg som ritar årsgränser, markerat år, helårshändelser och 100 kr-linjen bakom linjerna,
+// och händelsemarkörerna ovanpå. "konf" ändras när man klickar på ett nytt år.
+function skapaTidsplugin(konf) {
+  return {
+    id: 'tidsaxel',
+    beforeDatasetsDraw(chart) {
+      const { ctx, chartArea: yta, scales: { x, y } } = chart;
+      ctx.save();
+      if (konf.valtAr !== null && konf.valtAr >= x.min && konf.valtAr < x.max) {
+        const x1 = x.getPixelForValue(konf.valtAr), x2 = x.getPixelForValue(konf.valtAr + 1);
+        ctx.fillStyle = tonad(konf.farger.text, 0.07);
+        ctx.fillRect(x1, yta.top, x2 - x1, yta.bottom - yta.top);
+      }
+      for (const h of konf.handelser) {
+        if (!h.heltAr) continue;
+        const x1 = x.getPixelForValue(h.ar), x2 = x.getPixelForValue(h.ar + 1);
+        ctx.fillStyle = konf.monster;
+        ctx.fillRect(x1, yta.top, x2 - x1, yta.bottom - yta.top);
+      }
+      ctx.strokeStyle = konf.farger.grid; ctx.lineWidth = 1;
+      for (let v = Math.ceil(x.min); v <= x.max; v++) {
+        const px = Math.round(x.getPixelForValue(v)) + 0.5;
+        ctx.beginPath(); ctx.moveTo(px, yta.top); ctx.lineTo(px, yta.bottom); ctx.stroke();
+      }
+      // Tjockare vågrät linje vid 100 kr = det belopp vi satte in.
+      if (konf.referens !== null && konf.referens >= y.min && konf.referens <= y.max) {
+        const py = Math.round(y.getPixelForValue(konf.referens)) + 0.5;
+        ctx.strokeStyle = konf.farger.axel; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(yta.left, py); ctx.lineTo(yta.right, py); ctx.stroke();
+      }
+      ctx.restore();
+    },
+    afterDatasetsDraw(chart) {
+      const { ctx, chartArea: yta, scales: { x } } = chart;
+      chart.$markorer = [];
+      ctx.save();
+      konf.handelser.forEach((h, i) => {
+        const px = x.getPixelForValue(h.x);
+        if (px < yta.left - 1 || px > yta.right + 1) return;
+        if (!h.heltAr) {
+          ctx.setLineDash([3, 3]); ctx.strokeStyle = tonad(konf.farger.text2, 0.6); ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(px, yta.top); ctx.lineTo(px, yta.bottom); ctx.stroke();
+          ctx.setLineDash([]);
+        }
+        const py = yta.top - 13;
+        ctx.fillStyle = konf.farger.text2;
+        ctx.beginPath();
+        if (h.heltAr) { ctx.rect(px - 9, py - 9, 18, 18); } else { ctx.arc(px, py, 9, 0, Math.PI * 2); }
+        ctx.fill();
+        ctx.fillStyle = konf.farger.yta; ctx.font = `700 11px ${konf.typsnitt}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(String(i + 1), px, py + 0.5);
+        chart.$markorer.push({ px, py, h });
+      });
+      ctx.restore();
+    },
+  };
+}
+
+// Skriver slutvärdet ("158 kr") vid slutet av varje linje. Hoppar över etiketter som skulle krocka.
+function skapaSlutetikettPlugin(konf) {
+  return {
+    id: 'slutetiketter',
+    afterDatasetsDraw(chart) {
+      const { ctx } = chart;
+      const upptagna = [];
+      ctx.save();
+      ctx.font = `600 12px ${konf.typsnitt}`; ctx.fillStyle = konf.farg; ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+      chart.data.datasets.forEach((ds, i) => {
+        const meta = chart.getDatasetMeta(i);
+        const sista = meta.data[meta.data.length - 1], punkt = ds.data[ds.data.length - 1];
+        if (!sista || !punkt || ds.data.length < 2) return;
+        if (upptagna.some(u => Math.abs(u - sista.y) < 15)) return;
+        upptagna.push(sista.y);
+        ctx.fillText(tal(punkt.y, 0) + (konf.enhet ? ' ' + konf.enhet : ''), sista.x + 9, sista.y);
+      });
+      ctx.restore();
+    },
+  };
+}
+
+// Skriver "▲ +2,1" eller "▼ −3,4" vid varje stapel och tonar det markerade året.
+function skapaStapelplugin(konf) {
+  return {
+    id: 'staplar',
+    beforeDatasetsDraw(chart) {
+      const idx = konf.arLista.indexOf(konf.valtAr);
+      if (idx < 0) return;
+      const { ctx, chartArea: yta, scales: { x } } = chart;
+      const bredd = (yta.right - yta.left) / konf.arLista.length;
+      ctx.save();
+      ctx.fillStyle = tonad(konf.farger.text, 0.07);
+      ctx.fillRect(x.getPixelForValue(idx) - bredd / 2, yta.top, bredd, yta.bottom - yta.top);
+      ctx.restore();
+    },
+    afterDatasetsDraw(chart) {
+      const { ctx, scales: { y } } = chart;
+      ctx.save();
+      ctx.font = `600 11.5px ${konf.typsnitt}`; ctx.textAlign = 'center';
+      chart.data.datasets.forEach((ds, i) => {
+        chart.getDatasetMeta(i).data.forEach((bar, j) => {
+          const v = ds.data[j];
+          if (v === null || v === undefined) {
+            ctx.fillStyle = konf.farger.text3; ctx.textBaseline = 'bottom';
+            ctx.fillText('saknas', bar.x, y.getPixelForValue(0) - 4);
+            return;
+          }
+          const upp = v >= 0;
+          ctx.fillStyle = konf.farger.text; ctx.textBaseline = upp ? 'bottom' : 'top';
+          ctx.fillText(pil(v) + tal(v, 1, true), bar.x, bar.y + (upp ? -4 : 4));
+        });
+      });
+      ctx.restore();
+    },
+  };
+}
+
+// Visar en liten ruta när man pekar på eller klickar en händelsemarkör.
+function kopplaMarkorer(chart, canvas) {
+  const ram = canvas.parentElement;
+  let tips = ram.querySelector('.graftips');
+  if (!tips) { tips = document.createElement('div'); tips.className = 'graftips'; tips.hidden = true; ram.appendChild(tips); }
+  const hitta = ev => {
+    const r = canvas.getBoundingClientRect();
+    const x = ev.clientX - r.left, y = ev.clientY - r.top;
+    return (chart.$markorer || []).find(m => Math.abs(m.px - x) <= 12 && Math.abs(m.py - y) <= 12);
+  };
+  const visa = m => {
+    tips.textContent = `${m.h.datumText}: ${m.h.text}`;
+    const bredd = ram.clientWidth;
+    tips.style.left = Math.min(Math.max(m.px, 110), bredd - 110) + 'px';
+    tips.style.top = (m.py + 14) + 'px';
+    tips.hidden = false;
+  };
+  canvas.addEventListener('mousemove', ev => { const m = hitta(ev); if (m) visa(m); else tips.hidden = true; });
+  canvas.addEventListener('mouseleave', () => { tips.hidden = true; });
+  canvas.addEventListener('click', ev => { const m = hitta(ev); if (m) { visa(m); valjAr(m.h.ar); } });
+}
+
+// Linjediagram: "värdet av 100 kr". serier = [{etikett, farg, streck, punkt, punkter}]
+// enhet = "kr", eller t.ex. "EUR" för en fond med siffror i euro.
+function ritaLinje(canvas, serier, arLista, enhet = 'kr') {
+  forstorDiagram(canvas.id);
+  const f = temaFarger();
+  const typsnitt = getComputedStyle(document.body).fontFamily;
+  const start = arLista[0], slut = arLista[arLista.length - 1] + 1;
+  const konf = {
+    valtAr: tillstand.valtAr, handelser: handelserIPeriod(arLista), referens: 100, farger: f, typsnitt,
+    monster: randMonster(tonad(f.text2, 0.35)),
+  };
+  const chart = new Chart(canvas, {
+    type: 'line',
+    data: {
+      datasets: serier.map(s => ({
+        label: s.etikett, data: s.punkter,
+        borderColor: s.farg, backgroundColor: s.farg, borderWidth: 2, borderDash: s.streck, tension: 0,
+        borderCapStyle: 'round', borderJoinStyle: 'round',
+        pointStyle: s.punkt, pointRadius: 4.5, pointHoverRadius: 6.5, pointHitRadius: 12,
+        pointBackgroundColor: s.farg, pointBorderColor: f.yta, pointBorderWidth: 2,
+      })),
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: rorelseAv() ? false : { duration: 350 },
+      layout: { padding: { top: 28, right: 58, left: 2 } },
+      interaction: { mode: 'nearest', axis: 'x', intersect: false },
+      scales: {
+        x: {
+          type: 'linear', min: start, max: slut, grid: { display: false }, border: { color: f.axel },
+          afterBuildTicks: ax => { ax.ticks = arLista.map(a => ({ value: a + 0.5 })); },
+          ticks: { color: f.text3, autoSkip: false, maxRotation: 0, callback: v => String(Math.floor(v)) },
+        },
+        y: {
+          grace: '8%', grid: { color: f.grid }, border: { display: false },
+          ticks: { color: f.text3, maxTicksLimit: 6, precision: 0, callback: v => tal(v, 0) + (enhet ? ' ' + enhet : '') },
+        },
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          ...tooltipStil(f),
+          callbacks: {
+            title: items => {
+              const b = items[0].raw.x;
+              return b === start ? `1 januari ${b}` : `31 december ${b - 1}`;
+            },
+            label: c => `${c.dataset.label}: ${belopp(c.raw.y, enhet)}`,
+            afterLabel: c => c.raw.ar === null ? 'startvärde'
+              : `under ${c.raw.ar}: ${procent(c.raw.avk)}${c.raw.n ? ` (snitt av ${c.raw.n} fonder)` : ''}`,
+          },
+        },
+      },
+      onClick: (e, _el, ch) => {
+        if (e.y < ch.chartArea.top) return; // markörerna hanteras i kopplaMarkorer
+        const ar = Math.floor(ch.scales.x.getValueForPixel(e.x));
+        if (arLista.includes(ar)) valjAr(ar);
+      },
+    },
+    plugins: [skapaTidsplugin(konf), skapaSlutetikettPlugin({ farg: f.text2, typsnitt, enhet })],
+  });
+  chart.$konf = konf;
+  diagram[canvas.id] = chart;
+  kopplaMarkorer(chart, canvas);
+  return chart;
+}
+
+// Stapeldiagram: skillnad per år i procentenheter (grön = ESG bättre, röd = sämre).
+function ritaStaplar(canvas, arLista, varden, skala, etikett) {
+  forstorDiagram(canvas.id);
+  const f = temaFarger();
+  const typsnitt = getComputedStyle(document.body).fontFamily;
+  const konf = { arLista, valtAr: tillstand.valtAr, farger: f, typsnitt };
+  const lista = arLista.map(a => varden[a] ?? null);
+  const chart = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: arLista.map(String),
+      datasets: [{
+        label: etikett, data: lista,
+        backgroundColor: lista.map(v => {
+          if (v === null) return 'transparent';
+          const r = avrunda(v, 1); // färgen följer det avrundade talet som skrivs ut
+          return r > 0 ? f.battre : r < 0 ? f.samre : f.text3;
+        }),
+        borderRadius: 4, maxBarThickness: 30, categoryPercentage: 0.72, barPercentage: 0.9,
+      }],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: rorelseAv() ? false : { duration: 350 },
+      layout: { padding: { top: 4 } },
+      scales: {
+        x: { grid: { display: false }, border: { display: false }, ticks: { color: f.text3 } },
+        y: {
+          // "suggested" ger jämna steg på axeln; samma värden i alla diagram ger samma skala.
+          suggestedMin: skala.min, suggestedMax: skala.max, border: { display: false },
+          grid: { color: c => c.tick.value === 0 ? f.axel : f.grid, lineWidth: c => c.tick.value === 0 ? 1.5 : 1 },
+          ticks: { color: f.text3, maxTicksLimit: 7, precision: 0, callback: v => v === 0 ? '0' : tal(v, 0, true) + ' p.e.' },
+        },
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          ...tooltipStil(f), displayColors: false,
+          callbacks: {
+            title: items => items[0].label,
+            label: c => {
+              if (c.raw === null) return 'saknas';
+              const r = avrunda(c.raw, 1);
+              return `${pil(c.raw)}${pe(c.raw)} (${r > 0 ? 'ESG bättre' : r < 0 ? 'ESG sämre' : 'lika'})`;
+            },
+          },
+        },
+      },
+      onClick: (e, element, ch) => {
+        let idx = element.length ? element[0].index : Math.round(ch.scales.x.getValueForPixel(e.x));
+        if (arLista[idx] !== undefined) valjAr(arLista[idx]);
+      },
+    },
+    plugins: [skapaStapelplugin(konf)],
+  });
+  chart.$konf = konf;
+  diagram[canvas.id] = chart;
+  return chart;
+}
+
+// Gemensam y-skala för stapeldiagram, med plats för etiketterna.
+function stapelskala(alla) {
+  const v = alla.filter(x => x !== null && x !== undefined);
+  let min = Math.min(0, ...v), max = Math.max(0, ...v);
+  if (!v.length) { min = -5; max = 5; }
+  const spann = Math.max(max - min, 2);
+  return { min: min < 0 ? min - spann * 0.2 : 0, max: max + spann * 0.2 };
+}
+
+// Förklaring (legend) i HTML med linjens färg, streck och punktform.
+function seriefoklaringHtml(serier) {
+  const form = (p, farg) => {
+    const s = `style="fill: ${farg}; stroke: var(--yta); stroke-width: 1.5"`;
+    if (p === 'triangle') return `<polygon points="16,1 21,9 11,9" ${s}/>`;
+    if (p === 'rect') return `<rect x="12" y="1" width="8" height="8" ${s}/>`;
+    if (p === 'rectRot') return `<polygon points="16,0 21,5 16,10 11,5" ${s}/>`;
+    return `<circle cx="16" cy="5" r="4.2" ${s}/>`;
+  };
+  return `<ul class="seriefoklaring">${serier.map(s => `<li><svg width="32" height="10" aria-hidden="true"><line x1="1" y1="5" x2="31" y2="5" style="stroke: var(${s.fargVar}); stroke-width: 2; stroke-linecap: round" stroke-dasharray="${s.streck.join(' ')}"/>${form(s.punkt, `var(${s.fargVar})`)}</svg>${esc(s.namn)}${s.extra ? ` <span class="saknas">${esc(s.extra)}</span>` : ''}</li>`).join('')}</ul>`;
+}
+function graftomHtml(text) { return `<div class="graftom"><p>${text}</p></div>`; }
+const utanGrafText = 'Graferna kunde inte laddas (kräver internet för Chart.js). Tabellen nedan fungerar ändå.';
+
+/* ==========================================================
+   7. "VAD HÄNDE [ÅR]?"
+   Visar siffrorna för valt år, vår årsförklaring och händelser.
+   ========================================================== */
+function valjAr(ar) {
+  if (!periodAr().includes(ar)) return;
+  tillstand.valtAr = ar;
+  for (const ch of Object.values(diagram)) {
+    if (ch.$konf) { ch.$konf.valtAr = ar; ch.update('none'); }
+  }
+  document.querySelectorAll('[data-ar-rad]').forEach(tr => {
+    const vald = +tr.dataset.arRad === ar;
+    tr.classList.toggle('vald', vald);
+    const knapp = tr.querySelector('.arknapp');
+    if (knapp) { if (vald) knapp.setAttribute('aria-current', 'true'); else knapp.removeAttribute('aria-current'); }
+  });
+  renderVadHande();
+}
+function sakerstallValtAr() {
+  const lista = periodAr();
+  if (!lista.includes(tillstand.valtAr)) tillstand.valtAr = lista[0];
+}
+function renderVadHande() {
+  const el = aktivVy().querySelector('.vad-hande');
+  const k = tillstand.vadHandeKontext, ar = tillstand.valtAr;
+  if (!el || !k || ar === null) return;
+  const lista = periodAr(), idx = lista.indexOf(ar);
+  const fore = idx > 0 ? lista[idx - 1] : null, efter = idx >= 0 && idx < lista.length - 1 ? lista[idx + 1] : null;
+  const rad = (namn, varde, klass = '') => `<div><dt>${esc(namn)}</dt><dd class="${klass}">${varde}</dd></div>`;
+  let siffror = '';
+  if (k.typ === 'fond') {
+    const v = avk(k.fond, ar);
+    siffror = rad(k.fond.namn, procent(v), v === null ? 'saknas' : '');
+  } else if (k.typ === 'jamfor') {
+    const a = avk(k.index, ar), b = avk(k.esg, ar), d = (a !== null && b !== null) ? b - a : null;
+    siffror = rad(k.index.namn, procent(a), a === null ? 'saknas' : '') + rad(k.esg.namn, procent(b), b === null ? 'saknas' : '')
+      + rad('Skillnad (ESG − index)', d === null ? 'saknas' : pil(d) + pe(d, true), klassFor(d));
+  } else if (k.typ === 'grupp') {
+    siffror = k.serier.map(s => rad(s.grupp.namn, s.avkastning[ar] === null ? 'saknas' : `${procent(s.avkastning[ar])} <span class="antal">(${s.antal[ar]} st)</span>`, s.avkastning[ar] === null ? 'saknas' : '')).join('');
+  }
+  const forklaring = (data().arsforklaringar[ar] || '').trim();
+  const handelser = data().handelser.map(tolkaHandelse).filter(h => h && h.ar === ar);
+  // Kom ihåg om tangentbordsfokus låg på ‹/›-knapparna, så att fokus inte försvinner när rutan ritas om.
+  const fokusRiktning = el.contains(document.activeElement) ? document.activeElement.dataset.riktning : null;
+  el.innerHTML = `
+    <div class="vad-hande-topp">
+      <h3>Vad hände ${ar}?</h3>
+      <div class="arbladdrare">
+        <button type="button" data-riktning="fore" ${fore === null ? 'disabled aria-label="Inget tidigare år"' : `data-valj-ar="${fore}" aria-label="Föregående år, ${fore}"`}>‹ ${fore ?? ''}</button>
+        <button type="button" data-riktning="efter" ${efter === null ? 'disabled aria-label="Inget senare år"' : `data-valj-ar="${efter}" aria-label="Nästa år, ${efter}"`}>${efter ?? ''} ›</button>
+      </div>
+    </div>
+    <dl class="arsiffror">${siffror}</dl>
+    <div><h4>Vår förklaring</h4>${forklaring ? `<p>${esc(forklaring)}</p>` : `<p class="tom">Vi har inte skrivit någon förklaring för ${ar} ännu.</p>`}</div>
+    <div><h4>Händelser</h4>${handelser.length ? `<ul>${handelser.map(h => `<li>${esc(h.datumText)}: ${esc(h.text)}</li>`).join('')}</ul>` : `<p class="tom">Inga händelser inlagda för ${ar}.</p>`}</div>
+    <p class="hjalptext">Klicka på ett annat år i grafen eller tabellen.</p>`;
+  if (fokusRiktning) {
+    const knapp = el.querySelector(`[data-riktning="${fokusRiktning}"]:not([disabled])`) || el.querySelector('[data-riktning]:not([disabled])');
+    if (knapp) knapp.focus();
+  }
+}
+
+/* ==========================================================
+   8. SIDANS LÄGEN
+   ========================================================== */
+
+// ---------- Startsidan ----------
+function renderStart() {
+  // Startsidan visar alltid hela perioden 2019–2024 med alla fonder.
+  const lista = AR, alla = new Set();
+  const index = gruppSerie(GRUPPER[0], lista, alla);
+  const rader = GRUPPER.slice(1).map(g => {
+    const s = gruppSerie(g, lista, alla);
+    const j = gemensam(s.avkastning, index.avkastning, lista);
+    const antalMedSiffror = s.medlemmar.filter(f => lista.some(a => avk(f, a) !== null)).length;
+    let varde, detalj;
+    if (j.cagrSkillnad === null) {
+      varde = '<span class="saknas">kan inte räknas ut än</span>';
+      detalj = `Siffror saknas. ${antalMedSiffror} av ${s.medlemmar.length} fonder i gruppen har siffror.`;
+    } else {
+      varde = `<span class="${klassFor(j.cagrSkillnad)}">${pil(j.cagrSkillnad)}${pe(j.cagrSkillnad)}</span> per år`;
+      detalj = `Mot indexfonderna, ${arspann(j.a.forstaAr, j.a.sistaAr)}. 100 kr blev ${kr(j.a.slutvarde)} mot ${kr(j.b.slutvarde)}. ${antalMedSiffror} av ${s.medlemmar.length} fonder har siffror.`;
+    }
+    return `<div class="resultatrad"><div><strong>${esc(g.namn)}</strong></div><div class="varde">${varde}</div><p class="detalj">${detalj}</p></div>`;
+  });
+  document.getElementById('start-resultat').innerHTML = rader.join('') + valutaNotGrupp(alla, 'I läge 3 kan du ta bort fonden och se resultatet med bara kronor.');
+}
+
+// ---------- Läge 1: Sök en fond ----------
+function fondknappHtml(f) {
+  return `<a class="fondknapp ${f.typ === 'index' ? 'index' : 'esg'}" href="#fond-${f.nr}" data-ga="fond-${f.nr}">
+    <span class="nrbricka" aria-hidden="true">${f.nr}</span>
+    <span class="fondknapp-text"><span class="fondknapp-namn">${esc(f.namn)}</span><span class="fondknapp-typ">Fond ${f.nr} · ${f.typ === 'index' ? 'Index' : 'ESG nivå ' + esc(f.niva ?? '?')}</span></span></a>`;
+}
+function renderSokLista() {
+  const grupperade = GRUPPER.map(g => ({ namn: g.namn, lista: fonder().filter(g.ingar) }));
+  const ovriga = fonder().filter(f => !gruppFor(f));
+  if (ovriga.length) grupperade.push({ namn: 'Övriga fonder', lista: ovriga });
+  document.getElementById('fondknappar').innerHTML = grupperade.filter(g => g.lista.length).map(g => {
+    const ansvariga = [...new Set(g.lista.map(f => f.ansvarig).filter(Boolean))].join(', ');
+    return `<section class="fondgrupp"><h3>${esc(g.namn)}${ansvariga ? ` <span class="ansvarig">· ${esc(ansvariga)}</span>` : ''}</h3><div class="fondknappar">${g.lista.map(fondknappHtml).join('')}</div></section>`;
+  }).join('');
+  visaSokresultat();
+}
+function visaSokresultat() {
+  const falt = document.getElementById('sokfalt'), ut = document.getElementById('sokresultat');
+  const fraga = falt.value.trim();
+  if (!fraga) { ut.innerHTML = ''; return; }
+  const traffar = sokFonder(fraga).slice(0, 6);
+  ut.innerHTML = traffar.length
+    ? `<p class="hjalptext">${traffar.length === 1 ? '1 träff' : traffar.length + ' träffar'} – tryck Enter för att öppna den första.</p><div class="fondknappar">${traffar.map(t => fondknappHtml(t.fond)).join('')}</div>`
+    : `<p class="hjalptext">Hittade ingen fond som liknar ”${esc(fraga)}”. Prova en del av namnet eller fondens nummer (1–14).</p>`;
+}
+
+function renderFondDetalj(nr) {
+  const f = fondNr(nr);
+  const el = document.getElementById('fond-detalj');
+  if (!f) { el.innerHTML = `<div class="vyhuvud"><button type="button" class="knapp tillbaka" data-tillbaka="fond">← Tillbaka</button><div><h2>Fond ${esc(nr)} finns inte</h2><p>Välj en fond i listan.</p></div></div>`; return; }
+  sakerstallValtAr();
+  const lista = periodAr();
+  const k = kedja(f.avkastning, lista);
+  const stil = stilFor(f);
+  const grupp = gruppFor(f);
+  const not = periodNot(k, lista);
+  const enhet = enhetFor(f);
+  // Siffror i annan valuta än SEK markeras tydligt. Har fonden en annan valuta men siffrorna
+  // ska vara i SEK påminner vi om att kontrollera att de verkligen är omräknade.
+  const valutaVarning = utlandsk(f)
+    ? `<p class="anmarkning"><strong>Siffrorna för den här fonden är i ${esc(valutaOrd(f))} (${esc(avkValuta(f))}), inte i kronor.</strong> De går därför inte att jämföra helt med fonderna i SEK.</p>`
+    : (f.valuta && f.valuta !== 'SEK' ? `<p class="anmarkning">Fondens valuta är ${esc(f.valuta)}. Avkastningen ska anges i SEK – kontrollera att siffrorna är omräknade.</p>` : '');
+  const kurser = kursHtml(f);
+
+  el.innerHTML = `
+    <div class="vyhuvud">
+      <button type="button" class="knapp tillbaka" data-tillbaka="fond">← Tillbaka</button>
+      <div>
+        <p class="overrad">Fond nr ${f.nr}${grupp ? ' · ' + esc(grupp.namn) : ''}${f.ansvarig ? ' · ansvarig: ' + esc(f.ansvarig) : ''}</p>
+        <h2 id="rubrik-fonddetalj">${esc(f.namn)}</h2>
+        <div class="chips">${typChip(f)}${f.sfdr ? `<span class="chip">SFDR artikel ${esc(f.sfdr)}</span>` : ''}${utlandsk(f) ? `<span class="chip chip-varning">Siffror i ${esc(avkValuta(f))}</span>` : ''}${f.anmarkning ? '<span class="chip chip-varning">Anmärkning</span>' : ''}</div>
+      </div>
+    </div>
+    <div class="fondlayout">
+      <section class="panel omr-graf" aria-labelledby="rubrik-fondgraf">
+        <div class="panel-rubrik">
+          <h3 id="rubrik-fondgraf">Värdet av 100 ${esc(enhet)}</h3>
+          <p class="panel-under">${k.antalAr ? `insatta 1 januari ${k.forstaAr} (den tjockare vågräta linjen)${not ? ' · ' + esc(not) : ''}` : 'Inga siffror för den här perioden än.'}${utlandsk(f) ? ` · <strong>Siffrorna är i ${esc(valutaOrd(f))} (${esc(avkValuta(f))}).</strong>` : ''}</p>
+        </div>
+        ${k.antalAr && harChart() ? `<div class="graf"><canvas id="graf-fond" role="img" aria-label="Linjediagram över värdet av 100 ${esc(enhet)} i ${esc(namnMedValuta(f))}. Samma siffror finns i tabellen."></canvas></div>${handelselistaHtml(lista)}`
+          : graftomHtml(k.antalAr ? utanGrafText : 'Inga siffror ifyllda för den här fonden än. Fyll i data/fonder.json – eller testa i Data-läget.')}
+      </section>
+      <aside class="panel vad-hande omr-vad" aria-live="polite"></aside>
+      <section class="panel omr-tabell" aria-labelledby="rubrik-fondtabell">
+        <h3 id="rubrik-fondtabell">År för år</h3>
+        <div class="tabellram">${fondTabellHtml(f, k, lista)}</div>
+      </section>
+      <section class="panel omr-ai ai-panel" hidden aria-labelledby="rubrik-ai-fond">${aiPanelHtml('rubrik-ai-fond')}</section>
+      <section class="panel omr-fakta" aria-labelledby="rubrik-fakta">
+        <h3 id="rubrik-fakta">Fakta om fonden</h3>
+        ${f.anmarkning ? `<p class="anmarkning"><strong>Anmärkning:</strong> ${esc(f.anmarkning)}</p>` : ''}
+        ${valutaVarning}
+        <dl class="faktalista">
+          <div><dt>Typ</dt><dd>${esc(typText(f))}</dd></div>
+          <div><dt>ISIN</dt><dd>${f.isin ? `<span class="kod">${esc(f.isin)}</span>` : ejIfyllt}</dd></div>
+          <div><dt>Andelsklass</dt><dd>${f.andelsklass ? esc(f.andelsklass) : ejIfyllt}</dd></div>
+          <div><dt>Startdatum</dt><dd>${f.startdatum ? esc(datumText(f.startdatum)) : ejIfyllt}</dd></div>
+          <div><dt>Förvaltningsavgift</dt><dd>${f.forvaltningsavgift !== null ? tal(f.forvaltningsavgift, 2) + ' %' : ejIfyllt}</dd></div>
+          <div><dt>Total avgift per år</dt><dd>${f.totalAvgift !== null ? tal(f.totalAvgift, 2) + ' %' : ejIfyllt}</dd></div>
+          <div><dt>SFDR</dt><dd>${f.sfdr ? `Artikel ${esc(f.sfdr)}${f.sfdr === 9 ? ' (”mörkgrön”)' : f.sfdr === 8 ? ' (”ljusgrön”)' : ''}` : ejIfyllt}</dd></div>
+          <div><dt>Valuta</dt><dd>${f.valuta ? esc(f.valuta) : ejIfyllt}<br><span class="hjalptext">Avkastningen är angiven i ${esc(avkValuta(f))}.</span></dd></div>
+          ${kurser ? `<div><dt>Kurs vid årsskiftet</dt><dd>${kurser}</dd></div>` : ''}
+          <div><dt>Jämförelseindex</dt><dd>${f.jamforelseindex ? esc(f.jamforelseindex) : ejIfyllt}</dd></div>
+          <div><dt>Ansvarig</dt><dd>${f.ansvarig ? esc(f.ansvarig) : ejIfyllt}</dd></div>
+          <div><dt>Källa</dt><dd>${f.kalla ? esc(f.kalla) : ejIfyllt}<br><span class="hjalptext">${pdfHtml(f)}</span></dd></div>
+          <div><dt>Vår förklaring</dt><dd>${f.forklaring ? esc(f.forklaring) : '<span class="saknas">inte skriven än</span>'}</dd></div>
+        </dl>
+      </section>
+    </div>`;
+
+  if (k.antalAr && harChart()) {
+    ritaLinje(document.getElementById('graf-fond'), [{
+      etikett: namnMedValuta(f), farg: farg(stil.farg), streck: stil.streck, punkt: stil.punkt, punkter: k.punkter,
+    }], lista, enhet);
+  }
+  tillstand.vadHandeKontext = { typ: 'fond', fond: f };
+  tillstand.aiPrompt = () => aiPromptFond(f, lista);
+  renderVadHande();
+  visaAIPaneler();
+}
+function fondTabellHtml(f, k, lista) {
+  const enhet = enhetFor(f);
+  const rader = lista.map(ar => `<tr data-ar-rad="${ar}" class="${ar === tillstand.valtAr ? 'vald' : ''}">
+      <th scope="row"><button type="button" class="arknapp" data-valj-ar="${ar}" ${ar === tillstand.valtAr ? 'aria-current="true"' : ''}>${ar}</button></th>
+      ${avkCell(f, ar)}
+      <td>${k.varden[ar] !== undefined ? belopp(k.varden[ar], enhet) : '<span class="saknas">–</span>'}</td></tr>`).join('');
+  const kanRaknas = k.slutvarde !== null && k.antalAr > 0;
+  const period = kanRaknas ? arspann(k.forstaAr, k.sistaAr) : '';
+  return `<table>
+    <caption>Årsavkastning i ${esc(avkValuta(f))} efter avgifter, och vad 100 ${esc(enhet)} hade blivit.</caption>
+    <thead><tr><th scope="col">År</th><th scope="col">Avkastning${utlandsk(f) ? ` (${esc(avkValuta(f))})` : ''}</th><th scope="col">Värde vid årets slut</th></tr></thead>
+    <tbody>${rader}</tbody>
+    <tfoot>
+      <tr><th scope="row">Totalt ${esc(period)}</th><td class="${klassFor(k.total)}">${kanRaknas ? procent(k.total) : '<span class="saknas">kan ej beräknas</span>'}</td><td>${kanRaknas ? belopp(k.slutvarde, enhet) : ''}</td></tr>
+      <tr><th scope="row">Snitt per år (CAGR)</th><td class="${klassFor(k.cagr)}">${kanRaknas ? procent(k.cagr) : '<span class="saknas">kan ej beräknas</span>'}</td><td></td></tr>
+    </tfoot></table>
+    ${periodNot(k, lista) ? `<p class="fotnot">Obs: ${esc(periodNot(k, lista))}.</p>` : ''}
+    ${yahooKontrollHtml(f, lista)}`;
+}
+// Raden "Kontroll mot Yahoo Finance" under tabellen (visas bara om det finns Yahoo-siffror).
+function yahooKontrollHtml(f, lista) {
+  if (!AR.some(ar => yahooAvk(f, ar) !== null)) return '';
+  const valutaNot = f.kursValuta && f.kursValuta !== avkValuta(f)
+    ? ` Obs: Yahoo-kursen är i ${esc(f.kursValuta)} men våra siffror i ${esc(avkValuta(f))}.` : '';
+  const diffar = lista.filter(ar => avk(f, ar) !== null && yahooAvk(f, ar) !== null).map(ar => Math.abs(avk(f, ar) - yahooAvk(f, ar)));
+  if (!diffar.length) return `<p class="fotnot">Kontroll mot Yahoo Finance: inga år med både faktablad- och Yahoo-siffror än.${valutaNot}</p>`;
+  const max = Math.max(...diffar);
+  const forMycket = avrunda(max, 1) > 0.5 ? ' – mer än 0,5, undersök varför (andelsklass, utdelning eller valuta)' : '';
+  return `<p class="fotnot">Kontroll mot Yahoo Finance: avviker max ${tal(max, 1)} procentenheter${forMycket}.${valutaNot}</p>`;
+}
+// Kursen vid varje årsskifte, från Yahoo Finance (fältet "kursArsslut").
+function kursHtml(f) {
+  const k = f.kursArsslut;
+  if (!k || typeof k !== 'object') return '';
+  const rader = Object.keys(k).filter(ar => arTal(lasTal(k[ar]))).sort()
+    .map(ar => `<li><span>${esc(ar)}</span><span>${tal(lasTal(k[ar]), 2)} ${esc(f.kursValuta || '')}</span></li>`);
+  if (!rader.length) return '';
+  return `<ul class="kurslista">${rader.join('')}</ul><span class="hjalptext">Sista handelsdagen varje år, från Yahoo Finance${f.yahooHamtad ? ' (hämtad ' + esc(datumText(f.yahooHamtad)) + ')' : ''}.</span>`;
+}
+// Länk till faktabladet (PDF) i mappen kallor/. Länken visas när fältet "kalla" är ifyllt,
+// eftersom vi fyller i källan samtidigt som vi lägger PDF:en i kallor/ (se kallor/README.md).
+function pdfHtml(f) {
+  const sokvag = f.kallaFil;
+  if (!sokvag) return 'Ingen PDF angiven.';
+  if (!/^kallor\/[\w\-.]+\.pdf$/i.test(sokvag) || sokvag.includes('..')) return 'Ogiltigt filnamn för PDF (ska vara kallor/namn.pdf).';
+  if (!f.kalla.trim()) return `PDF ej uppladdad än (<span class="kod">${esc(sokvag)}</span>)`;
+  return `<a href="${esc(sokvag)}" target="_blank" rel="noopener">Öppna faktabladet (PDF)</a>`;
+}
+
+// ---------- Läge 2: Jämför ----------
+function fyllJamforval(indexNr, esgNr) {
+  const valIndex = document.getElementById('val-index'), valEsg = document.getElementById('val-esg');
+  const alt = f => `<option value="${f.nr}">${f.nr} · ${esc(f.namn)}</option>`;
+  valIndex.innerHTML = fonder().filter(f => f.typ === 'index').map(alt).join('');
+  valEsg.innerHTML = [1, 2, 3].map(n => {
+    const lista = fonder().filter(f => f.typ === 'esg' && f.niva === n);
+    return lista.length ? `<optgroup label="ESG nivå ${n} – ${NIVANAMN[n]}">${lista.map(alt).join('')}</optgroup>` : '';
+  }).join('');
+  valIndex.value = String(indexNr);
+  valEsg.value = String(esgNr);
+}
+function renderJamfor(route) {
+  const indexFonder = fonder().filter(f => f.typ === 'index'), esgFonder = fonder().filter(f => f.typ === 'esg');
+  let index = fondNr(route.index), esg = fondNr(route.esg);
+  if (!index || index.typ !== 'index') index = fondNr(3) || indexFonder[0];
+  if (!esg || esg.typ !== 'esg') esg = fondNr(7) || esgFonder[0];
+  const ut = document.getElementById('jamfor-resultat');
+  if (!index || !esg) { ut.innerHTML = '<p>Det finns inga fonder att jämföra.</p>'; return; }
+  fyllJamforval(index.nr, esg.nr);
+  sakerstallValtAr();
+  const lista = periodAr();
+  const j = gemensam(esg.avkastning, index.avkastning, lista); // a = ESG, b = index
+  const stilI = stilFor(index), stilE = stilFor(esg);
+  // Är fonderna i olika valuta (t.ex. BNP i EUR) markeras det, eftersom valutan då påverkar skillnaden.
+  const enhetI = enhetFor(index), enhetE = enhetFor(esg), sammaValuta = avkValuta(index) === avkValuta(esg);
+  const valutaNot = [esg, index].filter(utlandsk)
+    .map(f => `<p class="anmarkning"><strong>Obs:</strong> siffrorna för ${esc(f.namn)} är i ${esc(valutaOrd(f))} (${esc(avkValuta(f))}), inte i kronor. Skillnaden mellan fonderna påverkas därför också av valutakursen.</p>`).join('');
+
+  // Vilka år saknas för respektive fond?
+  const saknade = [esg, index].map(f => ({ f, ar: lista.filter(a => avk(f, a) === null) })).filter(x => x.ar.length && x.ar.length < lista.length);
+  const saknasText = saknade.map(x => `${x.f.namn} saknar siffror för ${x.ar.join(', ')}`).join('. ');
+
+  let mening;
+  if (j.cagrSkillnad === null) {
+    mening = j.a.lucka !== null
+      ? `Ett år saknas mitt i perioden (${j.a.lucka}), så snittet kan inte räknas ut. Flytta mätperioden för att jämföra.`
+      : 'Det finns inga år där båda fonderna har siffror än, så vi kan inte jämföra dem.';
+  } else {
+    const x = avrunda(j.cagrSkillnad, 1);
+    const hur = x > 0 ? `<strong>${tal(x, 1)} procentenheter mer</strong>` : x < 0 ? `<strong>${tal(Math.abs(x), 1)} procentenheter mindre</strong>` : '<strong>lika mycket</strong>';
+    mening = sammaValuta
+      ? `ESG-fonden gav i snitt ${hur} per år. 100 ${esc(enhetE)} blev <strong>${belopp(j.a.slutvarde, enhetE)}</strong> respektive <strong>${belopp(j.b.slutvarde, enhetI)}</strong>.`
+      : `ESG-fonden gav i snitt ${hur} per år. 100 ${esc(enhetE)} blev <strong>${belopp(j.a.slutvarde, enhetE)}</strong> i ESG-fonden och 100 ${esc(enhetI)} blev <strong>${belopp(j.b.slutvarde, enhetI)}</strong> i indexfonden.`;
+  }
+  const period = j.a.antalAr ? arspann(j.a.forstaAr, j.a.sistaAr) : '';
+  const periodInfo = !period ? ''
+    : j.a.lucka !== null ? `Graferna visar ${period}. ${j.a.luckor.join(', ')} saknas, så längre än så kan vi inte räkna. `
+    : `Jämförelsen gäller ${period} och bara år där båda fonderna har siffror. `;
+  const skillnader = {};
+  for (const ar of lista) { const a = avk(esg, ar), b = avk(index, ar); skillnader[ar] = (a !== null && b !== null) ? a - b : null; }
+
+  const serieInfo = [
+    { namn: `${namnMedValuta(index)} – index`, fargVar: stilI.farg, streck: stilI.streck, punkt: stilI.punkt },
+    { namn: `${namnMedValuta(esg)} – ESG`, fargVar: stilE.farg, streck: stilE.streck, punkt: stilE.punkt },
+  ];
+  const harData = j.a.antalAr > 0;
+
+  ut.innerHTML = `
+    <section class="panel" aria-label="Sammanfattning">
+      <p class="huvudmening">${mening}</p>
+      <p class="hjalptext">${periodInfo}Först ESG-fonden (${esc(esg.namn)}), sedan indexfonden (${esc(index.namn)}). ”I snitt per år” är skillnaden i genomsnittlig årlig avkastning (CAGR).${saknasText ? ' ' + esc(saknasText) + '.' : ''}</p>
+      ${valutaNot}
+    </section>
+    <div class="jamforlayout">
+      <section class="panel" aria-labelledby="rubrik-jamfor-linje">
+        <div class="panel-rubrik"><h3 id="rubrik-jamfor-linje">${sammaValuta ? `Värdet av 100 ${esc(enhetI)}` : 'Värdet av 100 (i varje fonds valuta)'}</h3><p class="panel-under">${harData ? `insatta 1 januari ${j.a.forstaAr}, samma dag i båda fonderna (den tjockare vågräta linjen)` : 'Inga gemensamma siffror än.'}</p></div>
+        ${seriefoklaringHtml(serieInfo)}
+        ${harData && harChart() ? `<div class="graf"><canvas id="graf-jamfor-linje" role="img" aria-label="Linjediagram: 100 kr i ${esc(index.namn)} och ${esc(esg.namn)}. Samma siffror finns i tabellen."></canvas></div>${handelselistaHtml(lista)}`
+          : graftomHtml(harData ? utanGrafText : 'Graferna visas när båda fonderna har siffror för samma år.')}
+      </section>
+      <aside class="panel vad-hande" aria-live="polite"></aside>
+      <section class="panel bred" aria-labelledby="rubrik-jamfor-stapel">
+        <div class="panel-rubrik"><h3 id="rubrik-jamfor-stapel">Skillnad per år: ESG − index</h3><p class="panel-under">I procentenheter. Grön ▲ = ESG-fonden bättre, röd ▼ = sämre.</p></div>
+        ${harChart() && Object.values(skillnader).some(v => v !== null) ? '<div class="graf"><canvas id="graf-jamfor-stapel" role="img" aria-label="Stapeldiagram över skillnaden per år i procentenheter. Samma siffror finns i tabellen."></canvas></div>'
+          : graftomHtml('Staplarna visas när båda fonderna har siffror för samma år.')}
+      </section>
+      <section class="panel bred" aria-labelledby="rubrik-jamfor-tabell">
+        <h3 id="rubrik-jamfor-tabell">År för år</h3>
+        <div class="tabellram">${jamforTabellHtml(index, esg, j, lista, skillnader)}</div>
+      </section>
+      <section class="panel bred ai-panel" hidden aria-labelledby="rubrik-ai-jamfor">${aiPanelHtml('rubrik-ai-jamfor')}</section>
+    </div>`;
+
+  if (harData && harChart()) {
+    ritaLinje(document.getElementById('graf-jamfor-linje'), [
+      { etikett: namnMedValuta(index), farg: farg(stilI.farg), streck: stilI.streck, punkt: stilI.punkt, punkter: j.b.punkter },
+      { etikett: namnMedValuta(esg), farg: farg(stilE.farg), streck: stilE.streck, punkt: stilE.punkt, punkter: j.a.punkter },
+    ], lista, sammaValuta ? enhetI : '');
+  }
+  const stapelCanvas = document.getElementById('graf-jamfor-stapel');
+  if (stapelCanvas) ritaStaplar(stapelCanvas, lista, skillnader, stapelskala(Object.values(skillnader)), 'ESG − index');
+  tillstand.vadHandeKontext = { typ: 'jamfor', index, esg };
+  tillstand.aiPrompt = () => aiPromptJamfor(index, esg, lista, j, skillnader);
+  renderVadHande();
+  visaAIPaneler();
+  tillstand.senasteJamfor = `jamfor-${index.nr}-${esg.nr}`;
+  ersattHash(tillstand.senasteJamfor);
+}
+function jamforTabellHtml(index, esg, j, lista, skillnader) {
+  const rader = lista.map(ar => {
+    const d = skillnader[ar];
+    return `<tr data-ar-rad="${ar}" class="${ar === tillstand.valtAr ? 'vald' : ''}">
+      <th scope="row"><button type="button" class="arknapp" data-valj-ar="${ar}" ${ar === tillstand.valtAr ? 'aria-current="true"' : ''}>${ar}</button></th>
+      ${avkCell(index, ar, false)}
+      ${avkCell(esg, ar, false)}
+      <td class="${klassFor(d)}">${d === null ? 'saknas' : pil(d) + pe(d, true)}</td></tr>`;
+  }).join('');
+  const ok = j.cagrSkillnad !== null;
+  const sammaValuta = avkValuta(index) === avkValuta(esg);
+  return `<table>
+    <caption>Årsavkastning efter avgifter${sammaValuta ? ` i ${esc(avkValuta(index))}` : ', i varje fonds valuta'}. Skillnad = ESG-fonden minus indexfonden.</caption>
+    <thead><tr><th scope="col">År</th><th scope="col">Indexfond<span class="kolnamn">${esc(namnMedValuta(index))}</span></th><th scope="col">ESG-fond<span class="kolnamn">${esc(namnMedValuta(esg))}</span></th><th scope="col">Skillnad</th></tr></thead>
+    <tbody>${rader}</tbody>
+    <tfoot>
+      <tr><th scope="row">100 blev${ok ? ' (' + arspann(j.a.forstaAr, j.a.sistaAr) + ')' : ''}</th><td>${ok ? belopp(j.b.slutvarde, enhetFor(index)) : '<span class="saknas">–</span>'}</td><td>${ok ? belopp(j.a.slutvarde, enhetFor(esg)) : '<span class="saknas">–</span>'}</td><td></td></tr>
+      <tr><th scope="row">Snitt per år (CAGR)</th><td>${ok ? procent(j.b.cagr) : '<span class="saknas">–</span>'}</td><td>${ok ? procent(j.a.cagr) : '<span class="saknas">–</span>'}</td><td class="${klassFor(j.cagrSkillnad)}">${ok ? pil(j.cagrSkillnad) + pe(j.cagrSkillnad, true) : '<span class="saknas">–</span>'}</td></tr>
+      <tr><th scope="row">Vanligt medelvärde av skillnaderna${j.antalDiffar ? ` (${j.antalDiffar} år)` : ''}</th><td></td><td></td><td class="${klassFor(j.aritmetisktSnitt)}">${j.aritmetisktSnitt !== null ? pil(j.aritmetisktSnitt) + pe(j.aritmetisktSnitt, true) : '<span class="saknas">–</span>'}</td></tr>
+    </tfoot></table>`;
+}
+
+// ---------- Läge 3: Grupper ----------
+// Varning om en fond med siffror i annan valuta (t.ex. BNP i EUR) räknas med i gruppernas snitt.
+function valutaNotGrupp(uteslutna, rad) {
+  const lista = fonder().filter(f => gruppFor(f) && !uteslutna.has(f.nr) && utlandsk(f) && AR.some(a => avk(f, a) !== null));
+  if (!lista.length) return '';
+  const namn = lista.map(f => `${esc(f.namn)} (${esc(gruppFor(f).kort)}, ${esc(avkValuta(f))})`).join(', ');
+  return `<p class="anmarkning"><strong>Obs:</strong> ${namn} har siffror i annan valuta än kronor men räknas med i snittet. ${rad}</p>`;
+}
+function renderGruppUrval() {
+  const el = document.getElementById('grupp-urval');
+  el.innerHTML = GRUPPER.map(g => {
+    const lista = fonder().filter(g.ingar);
+    return `<fieldset><legend>${esc(g.namn)}</legend>${lista.map(f => `
+      <label class="kryss" for="urval-${f.nr}"><input type="checkbox" id="urval-${f.nr}" data-urval="${f.nr}" ${tillstand.uteslutna.has(f.nr) ? '' : 'checked'}>
+      <span>${f.nr} · ${esc(f.namn)}${utlandsk(f) ? ` <span class="saknas">(siffror i ${esc(avkValuta(f))})</span>` : ''}${f.anmarkning ? ' <span class="saknas">(anmärkning)</span>' : ''}</span></label>`).join('')}</fieldset>`;
+  }).join('');
+  uppdateraUrvalRubrik();
+}
+function uppdateraUrvalRubrik() {
+  const alla = fonder().filter(f => gruppFor(f)).length;
+  const med = fonder().filter(f => gruppFor(f) && !tillstand.uteslutna.has(f.nr)).length;
+  document.getElementById('urval-rubrik').textContent = `Vilka fonder räknas? (${med} av ${alla})`;
+}
+function renderGrupper() {
+  sakerstallValtAr();
+  const lista = periodAr();
+  const serier = GRUPPER.map(g => gruppSerie(g, lista));
+  const index = serier[0];
+  const niva = serier.slice(1);
+  const jamforelser = niva.map(s => ({ s, j: gemensam(s.avkastning, index.avkastning, lista) }));
+  const skillnader = niva.map(s => {
+    const d = {};
+    for (const ar of lista) d[ar] = (s.avkastning[ar] !== null && index.avkastning[ar] !== null) ? s.avkastning[ar] - index.avkastning[ar] : null;
+    return d;
+  });
+  const skala = stapelskala(skillnader.flatMap(d => Object.values(d)));
+  const harLinjer = serier.some(s => s.kedja.antalAr > 0);
+
+  const sammanfattning = jamforelser.map(({ s, j }) => {
+    if (j.cagrSkillnad === null) return `<div class="resultatrad"><div><strong>${esc(s.grupp.namn)}</strong></div><div class="varde"><span class="saknas">kan inte räknas ut än</span></div><p class="detalj">Det behövs siffror för både gruppen och indexfonderna för samma år.</p></div>`;
+    const x = avrunda(j.cagrSkillnad, 1);
+    const ord = x > 0 ? 'mer' : x < 0 ? 'mindre' : 'lika mycket';
+    return `<div class="resultatrad"><div><strong>${esc(s.grupp.namn)}</strong></div>
+      <div class="varde"><span class="${klassFor(x)}">${pil(x)}${pe(x)}</span> per år</div>
+      <p class="detalj">Gav i snitt ${x === 0 ? 'lika mycket' : tal(Math.abs(x), 1) + ' procentenheter ' + ord} per år än indexfonderna under ${arspann(j.a.forstaAr, j.a.sistaAr)}. 100 kr blev ${kr(j.a.slutvarde)} mot ${kr(j.b.slutvarde)}.</p></div>`;
+  }).join('');
+
+  const serieInfo = serier.map(s => {
+    const st = STIL[s.grupp.id];
+    return { namn: s.grupp.namn, fargVar: st.farg, streck: st.streck, punkt: st.punkt, extra: s.kedja.antalAr ? '' : '(inga siffror)' };
+  });
+
+  document.getElementById('grupp-resultat').innerHTML = `
+    <section class="panel" aria-labelledby="rubrik-grupp-sammanfattning">
+      <div class="panel-rubrik"><h3 id="rubrik-grupp-sammanfattning">Resultat ${arspann(lista[0], lista[lista.length - 1])}</h3>
+      <p class="panel-under">Skillnad i genomsnittlig årlig avkastning (CAGR) mot indexfonderna, räknat på år där båda har siffror. Flytta mätperioden och se hur svaret ändras.</p></div>
+      <div class="resultatlista">${sammanfattning}</div>
+    </section>
+    <div class="jamforlayout">
+      <section class="panel" aria-labelledby="rubrik-grupp-linje">
+        <div class="panel-rubrik"><h3 id="rubrik-grupp-linje">Värdet av 100 kr – gruppernas snitt</h3><p class="panel-under">Varje år räknas snittet av fonderna i gruppen som har siffror (lika viktat). Den tjockare vågräta linjen = 100 kr insatt.</p></div>
+        ${valutaNotGrupp(tillstand.uteslutna, 'Ta bort den under ”Vilka fonder räknas?” om du bara vill jämföra kronor.')}
+        ${seriefoklaringHtml(serieInfo)}
+        ${harLinjer && harChart() ? `<div class="graf"><canvas id="graf-grupp-linje" role="img" aria-label="Linjediagram med fyra linjer: indexfonder och ESG nivå 1, 2 och 3. Samma siffror finns i tabellen."></canvas></div>${handelselistaHtml(lista)}`
+          : graftomHtml(harLinjer ? utanGrafText : 'Inga siffror ifyllda än.')}
+      </section>
+      <aside class="panel vad-hande" aria-live="polite"></aside>
+      <section class="panel bred" aria-labelledby="rubrik-grupp-staplar">
+        <div class="panel-rubrik"><h3 id="rubrik-grupp-staplar">Varje nivås skillnad mot indexgruppen</h3><p class="panel-under">I procentenheter per år. Grön ▲ = ESG-nivån bättre, röd ▼ = sämre. Alla tre har samma skala.</p></div>
+        <div class="smamultiplar">${niva.map((s, i) => `<div><h4>${esc(s.grupp.kort)} − Index</h4>${harChart() ? `<div class="graf liten"><canvas id="graf-grupp-stapel-${i + 1}" role="img" aria-label="Stapeldiagram: ${esc(s.grupp.namn)} minus indexfonderna per år."></canvas></div>` : graftomHtml(utanGrafText)}</div>`).join('')}</div>
+      </section>
+      <section class="panel bred" aria-labelledby="rubrik-grupp-tabell">
+        <h3 id="rubrik-grupp-tabell">År för år</h3>
+        <div class="tabellram">${gruppTabellHtml(serier, jamforelser, skillnader, lista)}</div>
+      </section>
+    </div>`;
+
+  if (harLinjer && harChart()) {
+    ritaLinje(document.getElementById('graf-grupp-linje'), serier.filter(s => s.kedja.antalAr).map(s => {
+      const st = STIL[s.grupp.id];
+      return {
+        etikett: s.grupp.kort === 'Index' ? 'Indexfonder' : 'ESG ' + s.grupp.kort.toLowerCase(),
+        farg: farg(st.farg), streck: st.streck, punkt: st.punkt,
+        punkter: s.kedja.punkter.map(p => ({ ...p, n: p.ar !== null ? s.antal[p.ar] : null })),
+      };
+    }), lista);
+  }
+  if (harChart()) niva.forEach((s, i) => ritaStaplar(document.getElementById(`graf-grupp-stapel-${i + 1}`), lista, skillnader[i], skala, `${s.grupp.kort} − Index`));
+  tillstand.vadHandeKontext = { typ: 'grupp', serier };
+  tillstand.aiPrompt = null;
+  renderVadHande();
+}
+function gruppTabellHtml(serier, jamforelser, skillnader, lista) {
+  const cell = (v, n) => v === null ? '<td class="saknas">saknas</td>' : `<td>${procent(v)}<span class="antal">(${n})</span></td>`;
+  // Gäller en siffra färre år än hela perioden skrivs åren ut inom parentes.
+  const hela = arspann(lista[0], lista[lista.length - 1]);
+  const aren = k => { const p = arspann(k.forstaAr, k.sistaAr); return p !== hela ? `<span class="antal">(${p})</span>` : ''; };
+  const rader = lista.map(ar => `<tr data-ar-rad="${ar}" class="${ar === tillstand.valtAr ? 'vald' : ''}">
+      <th scope="row"><button type="button" class="arknapp" data-valj-ar="${ar}" ${ar === tillstand.valtAr ? 'aria-current="true"' : ''}>${ar}</button></th>
+      ${serier.map(s => cell(s.avkastning[ar], s.antal[ar])).join('')}
+      ${skillnader.map(d => `<td class="${klassFor(d[ar])}">${d[ar] === null ? 'saknas' : pil(d[ar]) + pe(d[ar], true)}</td>`).join('')}</tr>`).join('');
+  const cagrRad = serier.map(s => `<td>${s.kedja.slutvarde !== null && s.kedja.antalAr ? procent(s.kedja.cagr) + aren(s.kedja) : '<span class="saknas">–</span>'}</td>`).join('');
+  const diffRad = jamforelser.map(({ j }) => `<td class="${klassFor(j.cagrSkillnad)}">${j.cagrSkillnad !== null ? pil(j.cagrSkillnad) + pe(j.cagrSkillnad, true) + aren(j.a) : '<span class="saknas">–</span>'}</td>`).join('');
+  const slutRad = serier.map(s => `<td>${s.kedja.slutvarde !== null && s.kedja.antalAr ? kr(s.kedja.slutvarde) + aren(s.kedja) : '<span class="saknas">–</span>'}</td>`).join('');
+  return `<table>
+    <caption>Snitt av fondernas årsavkastning. Siffran inom parentes är antalet fonder med siffror det året.</caption>
+    <thead><tr><th scope="col">År</th>${serier.map(s => `<th scope="col">${esc(s.grupp.kort)}</th>`).join('')}${serier.slice(1).map(s => `<th scope="col">${esc(s.grupp.kort)} − Index</th>`).join('')}</tr></thead>
+    <tbody>${rader}</tbody>
+    <tfoot>
+      <tr><th scope="row">100 kr blev</th>${slutRad}<td colspan="3"></td></tr>
+      <tr><th scope="row">Snitt per år (CAGR)</th>${cagrRad}${diffRad}</tr>
+    </tfoot></table>
+    <p class="fotnot">Gäller en siffra färre år än hela perioden står åren inom parentes. Skillnaden i CAGR räknas bara på år där både ESG-nivån och indexgruppen har siffror.</p>`;
+}
+
+// ---------- Data-läget ----------
+const TEXTFALT_NULL = ['isin', 'andelsklass', 'startdatum', 'valuta', 'jamforelseindex', 'ansvarig'];
+const TALFALT = ['forvaltningsavgift', 'totalAvgift'];
+// Skapar ett utkast från datafilen första gången. Datafilen sparas också som "bas",
+// så att sidan senare kan se om någon har lagt in nya siffror i filen.
+function sakerstallUtkast() {
+  if (!tillstand.utkast) { tillstand.utkast = klona(tillstand.filData); tillstand.utkastBas = klona(tillstand.filData); }
+}
+function raknare(f) { return `${AR.filter(a => avk(f, a) !== null).length} av ${AR.length} år`; }
+// Värdet som visas i ett formulärfält. Tal visas med komma, text visas som den är.
+function inVarde(v) {
+  if (v === null || v === undefined) return '';
+  return esc(typeof v === 'number' ? String(v).replace('.', ',') : String(v));
+}
+
+function renderData() {
+  sakerstallUtkast();
+  const u = tillstand.utkast;
+  const info = document.getElementById('datainfo');
+  info.innerHTML = `
+    <h3>Så fyller ni i datan</h3>
+    <ol class="steglista">
+      <li>Skriv årsavkastningen i procent (SEK, efter avgifter) från fondens faktablad. Tomt fält = saknas.</li>
+      <li>Allt sparas automatiskt som ett utkast i den här webbläsaren. Det är bara ett arbetsverktyg.</li>
+      <li>Tryck <strong>Visa JSON</strong> och <strong>Kopiera JSON</strong>. Klistra in texten i <span class="kod">data/fonder.json</span> och i reservkopian i <span class="kod">index.html</span>.</li>
+      <li>Gör en commit och pusha till GitHub. Då uppdateras sidan.</li>
+    </ol>
+    <p class="infoplatta">${tillstand.datakalla === 'fil'
+      ? 'Sidan läser siffrorna från <span class="kod">data/fonder.json</span>.'
+      : 'Sidan kunde inte läsa <span class="kod">data/fonder.json</span> (det händer när index.html öppnas genom dubbelklick). Den använder därför reservkopian i <span class="kod">index.html</span>.'}</p>
+    ${tillstand.reservInaktuell ? '<p class="infoplatta varning"><strong>Reservkopian i index.html är inte samma som data/fonder.json.</strong> Klistra in JSON:en även i index.html, mellan <span class="kod">&lt;script type="application/json" id="reservdata"&gt;</span> och <span class="kod">&lt;/script&gt;</span>.</p>' : ''}
+    ${tillstand.utkastNotis ? `<p class="infoplatta varning">${esc(tillstand.utkastNotis)}</p>` : ''}
+    ${DATAVARNINGAR.size ? `<div class="infoplatta varning"><strong>Orimliga värden i datan:</strong><ul>${[...DATAVARNINGAR].map(v => `<li>${esc(v)}</li>`).join('')}</ul></div>` : ''}`;
+
+  document.getElementById('forhandsgranska').checked = tillstand.forhandsgranska;
+  document.getElementById('kontrollerad').checked = u.exempeldata === false;
+
+  document.getElementById('dataformular').innerHTML = u.fonder.map(f => {
+    const id = `d-${f.nr}`;
+    // Fondens namn står (osynligt) i varje grupprubrik, så att skärmläsare vet vilken fond fälten gäller.
+    const forFond = `<span class="visuellt-dold"> – ${esc(f.namn)}</span>`;
+    const textfalt = (falt, etikett, textarea = false) => `<div class="falt"><label for="${id}-${falt}">${etikett}</label>${textarea
+      ? `<textarea id="${id}-${falt}" data-nr="${f.nr}" data-falt="${falt}">${esc(f[falt] ?? '')}</textarea>`
+      : `<input id="${id}-${falt}" data-nr="${f.nr}" data-falt="${falt}" value="${inVarde(f[falt])}" autocomplete="off" ${TALFALT.includes(falt) ? `inputmode="decimal" aria-describedby="${id}-fel-avgift"` : ''}>`}</div>`;
+    return `<details class="datafond ${f.typ === 'index' ? 'index' : 'esg'}" data-fond="${f.nr}">
+      <summary><span class="nrbricka ${f.typ === 'index' ? '' : 'esg'}" aria-hidden="true">${f.nr}</span><span class="namn">${esc(f.namn)}</span><span class="raknare" id="${id}-raknare">${raknare(f)}</span></summary>
+      <div class="datainre">
+        <fieldset class="faltgrupp"><legend>Årsavkastning i % (SEK, efter avgifter)${forFond}</legend>
+          <div class="arsrutnat">${AR.map(ar => `<div class="arsfalt"><label for="${id}-${ar}">${ar}</label><input id="${id}-${ar}" autocomplete="off" data-nr="${f.nr}" data-falt="avk" data-ar="${ar}" value="${inVarde(f.avkastning[ar])}" placeholder="saknas" aria-describedby="${id}-fel"></div>`).join('')}</div>
+          <p class="felrad" id="${id}-fel" hidden>Skriv ett tal, t.ex. 12,5 eller −3,1 (lägst −100). Lämna tomt om siffran saknas.</p>
+        </fieldset>
+        <fieldset class="faltgrupp"><legend>Källa och förklaring${forFond}</legend>
+          <div class="faltrutnat">${textfalt('kalla', 'Källa (dokument och datum)')}${textfalt('forklaring', 'Vår förklaring om fonden', true)}${textfalt('anmarkning', 'Anmärkning', true)}</div>
+        </fieldset>
+        <fieldset class="faltgrupp"><legend>Faktauppgifter${forFond}</legend>
+          <div class="faltrutnat">
+            ${textfalt('isin', 'ISIN')}${textfalt('andelsklass', 'Andelsklass')}${textfalt('startdatum', 'Startdatum (ÅÅÅÅ-MM-DD)')}
+            ${textfalt('forvaltningsavgift', 'Förvaltningsavgift (%)')}${textfalt('totalAvgift', 'Total avgift (%)')}
+            <div class="falt"><label for="${id}-sfdr">SFDR-artikel</label><select id="${id}-sfdr" data-nr="${f.nr}" data-falt="sfdr">
+              ${[['', 'ej ifyllt'], ['6', 'Artikel 6'], ['8', 'Artikel 8'], ['9', 'Artikel 9']].map(([v, t]) => `<option value="${v}" ${String(f.sfdr ?? '') === v ? 'selected' : ''}>${t}</option>`).join('')}
+            </select></div>
+            ${textfalt('valuta', 'Fondens valuta')}
+            <div class="falt"><label for="${id}-avkastningValuta">Valuta för avkastningen</label><select id="${id}-avkastningValuta" data-nr="${f.nr}" data-falt="avkastningValuta">
+              ${['SEK', 'EUR', 'NOK', 'USD'].map(v => `<option value="${v}" ${avkValuta(f) === v ? 'selected' : ''}>${v}</option>`).join('')}
+            </select></div>
+            ${textfalt('jamforelseindex', 'Jämförelseindex')}${textfalt('ansvarig', 'Ansvarig')}
+          </div>
+          <p class="felrad" id="${id}-fel-avgift" hidden>Avgifter skrivs som ett tal i procent, t.ex. 0,25. Lämna tomt om uppgiften saknas.</p>
+        </fieldset>
+      </div>
+    </details>`;
+  }).join('');
+
+  document.getElementById('arsforklaringar-formular').innerHTML = AR.map(ar => `<div class="falt"><label for="af-${ar}">${ar}</label><textarea id="af-${ar}" data-arsforklaring="${ar}">${esc(u.arsforklaringar[ar])}</textarea></div>`).join('');
+  document.getElementById('json-ut').hidden = true;
+  document.getElementById('exportstatus').textContent = '';
+  visaSparstatus();
+}
+
+// Utkastet sparas 0,3 sekunder efter senaste ändringen (och direkt om fliken stängs).
+let sparTimer = null;
+function sparaUtkastNu() {
+  clearTimeout(sparTimer); sparTimer = null;
+  if (!tillstand.utkast) return;
+  const ok = sparaLagrat(UTKAST_NYCKEL, JSON.stringify({ bas: tillstand.utkastBas, data: tillstand.utkast }));
+  tillstand.senastSparat = ok ? new Date() : false;
+  visaSparstatus();
+  const jsonUt = document.getElementById('json-ut');
+  if (!jsonUt.hidden) jsonUt.value = exportJson();
+}
+function sparaUtkastSnart() {
+  clearTimeout(sparTimer);
+  sparTimer = setTimeout(sparaUtkastNu, 300);
+  uppdateraBanderoller();
+}
+function visaSparstatus() {
+  const el = document.getElementById('sparstatus');
+  if (tillstand.senastSparat === false) el.textContent = 'Kunde inte spara i webbläsaren (privat fönster?). Kopiera JSON:en innan du stänger sidan.';
+  else if (tillstand.senastSparat) el.textContent = `Utkastet sparades i webbläsaren kl. ${tillstand.senastSparat.toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' })}.`;
+  else el.textContent = lasLagrat(UTKAST_NYCKEL) ? 'Ett sparat utkast finns i webbläsaren.' : 'Inget utkast sparat än. Formuläret visar siffrorna från datafilen.';
+}
+function hanteraDataInput(e) {
+  const el = e.target;
+  const u = tillstand.utkast;
+  if (el.dataset.arsforklaring) { u.arsforklaringar[el.dataset.arsforklaring] = el.value; sparaUtkastSnart(); return; }
+  const falt = el.dataset.falt;
+  if (!falt) return;
+  const f = u.fonder.find(x => x.nr === +el.dataset.nr);
+  if (!f) return;
+  if (falt === 'avk' || TALFALT.includes(falt)) {
+    const v = lasTal(el.value);
+    // Ogiltigt: inte ett tal, avkastning under −100 % eller negativ avgift.
+    const ogiltigt = Number.isNaN(v) || (v !== null && (falt === 'avk' ? v < -100 : v < 0));
+    if (ogiltigt) { el.setAttribute('aria-invalid', 'true'); visaFelrad(f.nr); return; }
+    el.removeAttribute('aria-invalid');
+    visaFelrad(f.nr);
+    if (falt === 'avk') f.avkastning[el.dataset.ar] = v; else f[falt] = v;
+    const r = document.getElementById(`d-${f.nr}-raknare`);
+    if (r) r.textContent = raknare(f);
+  } else if (falt === 'sfdr') {
+    f.sfdr = el.value === '' ? null : +el.value;
+  } else {
+    f[falt] = (TEXTFALT_NULL.includes(falt) && el.value.trim() === '') ? null : el.value;
+  }
+  sparaUtkastSnart();
+}
+// Visar felraden under årsfälten respektive avgiftsfälten om något fält är fel ifyllt.
+function visaFelrad(nr) {
+  const d = document.querySelector(`details[data-fond="${nr}"]`);
+  if (!d) return;
+  const avkFel = d.querySelector('[data-falt="avk"][aria-invalid="true"]');
+  const avgiftFel = d.querySelector('[data-falt="forvaltningsavgift"][aria-invalid="true"], [data-falt="totalAvgift"][aria-invalid="true"]');
+  document.getElementById(`d-${nr}-fel`).hidden = !avkFel;
+  document.getElementById(`d-${nr}-fel-avgift`).hidden = !avgiftFel;
+}
+// Stoppar exporten om något fält är fel ifyllt, annars skulle värdet tyst saknas i JSON:en.
+function kanExportera(status) {
+  const fel = document.querySelectorAll('#dataformular [aria-invalid="true"]');
+  if (!fel.length) return true;
+  status.textContent = `${fel.length === 1 ? 'Ett fält är' : fel.length + ' fält är'} fel ifyllt och skulle inte komma med i JSON:en. Rätta det först (markerat med röd ram).`;
+  const d = fel[0].closest('details');
+  if (d) d.open = true;
+  fel[0].focus();
+  return false;
+}
+// JSON:en som klistras in i datafilen. "<" skrivs som < så att texten
+// aldrig kan avsluta <script>-blocket med reservkopian i index.html.
+function exportJson() { return snyggJson(tillstand.utkast).replace(/</g, '\\u003c'); }
+
+// Snygg JSON: korta listor och objekt med bara enkla värden hamnar på en rad (som i datafilen).
+function inlineJson(v) {
+  if (Array.isArray(v)) return '[' + v.map(inlineJson).join(', ') + ']';
+  if (v && typeof v === 'object') return '{' + Object.keys(v).map(k => JSON.stringify(k) + ': ' + inlineJson(v[k])).join(', ') + '}';
+  return JSON.stringify(v);
+}
+function snyggJson(v, indrag = '') {
+  if (v === null || typeof v !== 'object') return JSON.stringify(v);
+  const barn = Array.isArray(v) ? v : Object.values(v);
+  const inline = inlineJson(v);
+  if (barn.length === 0 || (barn.every(x => x === null || typeof x !== 'object') && indrag.length + inline.length <= 130)) return inline;
+  const nytt = indrag + '  ';
+  if (Array.isArray(v)) return '[\n' + v.map(x => nytt + snyggJson(x, nytt)).join(',\n') + '\n' + indrag + ']';
+  return '{\n' + Object.keys(v).map(k => nytt + JSON.stringify(k) + ': ' + snyggJson(v[k], nytt)).join(',\n') + '\n' + indrag + '}';
+}
+
+/* ==========================================================
+   9. AI-FÖRKLARING
+   Knappen visas bara om sidan körs som artifact i claude.ai
+   (window.claude finns). Ingen API-nyckel finns i koden.
+   ========================================================== */
+let aiFunktion = null;
+async function startaAI() {
+  if (!window.claude || typeof window.claude.use !== 'function') return; // t.ex. GitHub Pages: ingen AI
+  try {
+    const s = await window.claude.use('sample');
+    if (typeof s === 'function') { aiFunktion = s; visaAIPaneler(); }
+  } catch (e) { /* ingen AI – sidan fungerar ändå */ }
+}
+function visaAIPaneler() { document.querySelectorAll('.ai-panel').forEach(p => { p.hidden = !aiFunktion; }); }
+function aiPanelHtml(rubrikId) {
+  return `<div class="panel-rubrik"><h3 id="${rubrikId}">Förklara med AI</h3>
+    <p class="panel-under">Claude skriver en kort förklaring utifrån siffrorna ovan och våra årsförklaringar. AI-förklaringar är tolkningar och kan innehålla fel.</p></div>
+    <div class="knapprad"><button type="button" class="knapp primar" data-ai="start">Förklara med AI</button><button type="button" class="knapp" data-ai="stopp" hidden>Avbryt</button></div>
+    <p class="ai-status" aria-live="polite"></p>
+    <div class="ai-svar"></div>`;
+}
+function avbrytAI() { if (tillstand.aiKontroll) { tillstand.aiKontroll.abort(); tillstand.aiKontroll = null; } }
+function aiFeltext(kod) {
+  switch (kod) {
+    case 'rate_limited': return 'För många frågor just nu. Vänta en stund och tryck sedan igen.';
+    case 'cancelled': return 'Avbruten.';
+    case 'session_expired': return 'Du behöver logga in på claude.ai igen.';
+    case 'refused': return 'AI:n svarade inte på den här frågan.';
+    case 'prompt_too_large': return 'Frågan blev för lång för AI:n. Välj en kortare period.';
+    default: return 'Något gick fel. Försök igen om en stund.';
+  }
+}
+async function korAI(panel) {
+  if (!aiFunktion || !tillstand.aiPrompt) return;
+  const knapp = panel.querySelector('[data-ai="start"]'), stopp = panel.querySelector('[data-ai="stopp"]');
+  const status = panel.querySelector('.ai-status'), svar = panel.querySelector('.ai-svar');
+  const prompt = tillstand.aiPrompt();
+  if (!prompt) { status.textContent = 'Det finns inga siffror att förklara ännu.'; return; }
+  avbrytAI();
+  const kontroll = new AbortController();
+  tillstand.aiKontroll = kontroll;
+  knapp.disabled = true; stopp.hidden = false; svar.textContent = '';
+  status.textContent = 'Tänker … det kan ta upp till en minut.';
+  try {
+    const { text, truncated } = await aiFunktion(prompt, {
+      modelTier: 'default', signal: kontroll.signal,
+      onText: ({ text }) => { svar.textContent = text; status.textContent = 'Skriver …'; },
+    });
+    svar.textContent = text;
+    status.textContent = truncated ? 'Svaret blev avkortat.' : 'Klart. Kom ihåg att orsakerna är tolkningar.';
+  } catch (e) {
+    const kod = e && e.code;
+    if (['not_granted', 'sampling_disabled', 'not_declared', 'capability_disabled', 'capability_removed'].includes(kod)) {
+      aiFunktion = null; visaAIPaneler(); return; // AI får inte användas här: dölj knappen
+    }
+    svar.textContent = kod === 'refused' ? '' : (e && e.text) || svar.textContent;
+    status.textContent = aiFeltext(kod);
+  } finally {
+    if (tillstand.aiKontroll === kontroll) tillstand.aiKontroll = null;
+    knapp.disabled = false; stopp.hidden = true;
+  }
+}
+function aiRegler() {
+  return [
+    'Du hjälper tre gymnasieelever att förklara fondavkastning på deras skolhemsida.',
+    'Regler:',
+    '- Svara på svenska med högst 150 ord.',
+    '- Skriv enkelt, så att en gymnasieelev förstår.',
+    '- Använd BARA siffrorna nedan. Hitta aldrig på siffror, procentsatser eller datum.',
+    '- Om en siffra saknas: säg att den saknas och gissa inte.',
+    '- Skriv vanlig löptext utan rubriker och utan punktlistor.',
+    '- Avsluta med en mening om att orsakerna är tolkningar och inte säkra fakta.',
+  ].join('\n');
+}
+function aiGemensamt(lista) {
+  const exempel = data().exempeldata ? '\nObs: siffrorna är exempeldata och är inte kontrollerade än.\n' : '';
+  const forklaringar = lista.map(ar => `- ${ar}: ${(data().arsforklaringar[ar] || '').trim() || '(ingen förklaring skriven)'}`).join('\n');
+  const handelser = handelserIPeriod(lista).map(h => `- ${h.datumText}: ${h.text}`).join('\n') || '- (inga)';
+  return { exempel, forklaringar, handelser };
+}
+function aiFondText(f) {
+  return [
+    `Namn: ${f.namn} (fond nr ${f.nr})`,
+    `Typ: ${typText(f)}`,
+    f.jamforelseindex ? `Jämförelseindex: ${f.jamforelseindex}` : null,
+    f.sfdr ? `SFDR: artikel ${f.sfdr}` : null,
+    f.anmarkning ? `Anmärkning: ${f.anmarkning}` : null,
+    `Avkastningen är angiven i: ${avkValuta(f)} (${valutaOrd(f)})`,
+    `Vår beskrivning av fonden: ${f.forklaring.trim() || '(ingen skriven)'}`,
+  ].filter(Boolean).join('\n');
+}
+function aiPromptFond(f, lista) {
+  if (!lista.some(ar => avk(f, ar) !== null)) return null;
+  const k = kedja(f.avkastning, lista);
+  const g = aiGemensamt(lista);
+  const summa = k.slutvarde !== null && k.antalAr
+    ? `Totalt ${arspann(k.forstaAr, k.sistaAr)}: ${procent(k.total)} (100 ${enhetFor(f)} blev ${belopp(k.slutvarde, enhetFor(f))}). Genomsnitt per år (CAGR): ${procent(k.cagr)}.`
+    : 'Totalt och genomsnitt kan inte räknas ut eftersom siffror saknas.';
+  return `${aiRegler()}
+${g.exempel}
+FONDEN
+${aiFondText(f)}
+
+ÅRSAVKASTNING (procent, i ${avkValuta(f)}, efter avgifter)
+${lista.map(ar => `- ${ar}: ${procent(avk(f, ar))}`).join('\n')}
+${summa}
+
+VÅRA FÖRKLARINGAR PER ÅR
+${g.forklaringar}
+
+HÄNDELSER VI HAR MARKERAT
+${g.handelser}
+
+UPPGIFT
+Förklara kort hur fonden har gått ${arspann(lista[0], lista[lista.length - 1])} och vilka möjliga orsaker som finns.`;
+}
+function aiPromptJamfor(index, esg, lista, j, skillnader) {
+  if (!Object.values(skillnader).some(v => v !== null)) return null;
+  const g = aiGemensamt(lista);
+  const summa = j.cagrSkillnad !== null
+    ? `Sammanfattning (${arspann(j.a.forstaAr, j.a.sistaAr)}, bara år där båda har siffror): ESG-fonden gav i snitt ${pe(j.cagrSkillnad)} per år jämfört med indexfonden (skillnad i CAGR). 100 ${enhetFor(esg)} blev ${belopp(j.a.slutvarde, enhetFor(esg))} i ESG-fonden och 100 ${enhetFor(index)} blev ${belopp(j.b.slutvarde, enhetFor(index))} i indexfonden.`
+    : 'Snittet kan inte räknas ut eftersom siffror saknas.';
+  return `${aiRegler()}
+${g.exempel}
+INDEXFONDEN
+${aiFondText(index)}
+
+ESG-FONDEN
+${aiFondText(esg)}
+
+ÅRSAVKASTNING (procent, efter avgifter; indexfonden i ${avkValuta(index)}, ESG-fonden i ${avkValuta(esg)})
+${lista.map(ar => `- ${ar}: indexfonden ${procent(avk(index, ar))}, ESG-fonden ${procent(avk(esg, ar))}, skillnad (ESG − index) ${pe(skillnader[ar])}`).join('\n')}
+${summa}
+
+VÅRA FÖRKLARINGAR PER ÅR
+${g.forklaringar}
+
+HÄNDELSER VI HAR MARKERAT
+${g.handelser}
+
+UPPGIFT
+Förklara kort varför ESG-fonden gick bättre eller sämre än indexfonden och vilka möjliga orsaker som finns.`;
+}
+
+/* ==========================================================
+   10. NAVIGERING MELLAN LÄGEN
+   Adressen (#fond-12, #jamfor-3-7, #grupper, #data) styr vad som
+   visas, så att bakåtknappen och "Tillbaka" fungerar.
+   ========================================================== */
+function lasRoute(hash) {
+  const h = String(hash || '').replace(/^#/, '');
+  let m;
+  if (h === 'fond') return { vy: 'fond' };
+  if ((m = /^fond-(\d{1,2})$/.exec(h))) return { vy: 'fond', nr: +m[1] };
+  if (h === 'jamfor') return { vy: 'jamfor', index: 3, esg: 7 };
+  if ((m = /^jamfor-(\d{1,2})-(\d{1,2})$/.exec(h))) return { vy: 'jamfor', index: +m[1], esg: +m[2] };
+  if (h === 'grupper') return { vy: 'grupper' };
+  if (h === 'data') return { vy: 'data' };
+  return { vy: 'start' };
+}
+function gaTill(hash) {
+  // Fliken "Jämför" öppnar det fondpar man senast tittade på.
+  if (hash === 'jamfor' && tillstand.senasteJamfor) hash = tillstand.senasteJamfor;
+  // Samma sida igen: rita om, men lägg inget nytt steg i historiken (annars verkar Tillbaka inte fungera).
+  if (hash === tillstand.aktuellHash) { visa(hash); return; }
+  try { history.pushState({ steg: ((history.state && history.state.steg) || 0) + 1 }, '', '#' + hash); }
+  catch (e) { tillstand.internHistorik.push(tillstand.aktuellHash); }
+  visa(hash);
+}
+function ersattHash(hash) {
+  tillstand.aktuellHash = hash;
+  try { history.replaceState(history.state, '', '#' + hash); } catch (e) { /* går inte i alla miljöer */ }
+}
+function tillbaka(foralder) {
+  if (history.state && history.state.steg > 0) { history.back(); return; }
+  if (tillstand.internHistorik.length) { visa(tillstand.internHistorik.pop()); return; }
+  gaTill(foralder);
+}
+// Den del av sidan (läge) som visas just nu.
+function aktivVy() { return document.getElementById('vy-' + (tillstand.aktuellVy || 'start')); }
+
+function visa(hash, { forsta = false, tyst = false } = {}) {
+  const r = lasRoute(hash);
+  tillstand.aktuellHash = hash || 'start';
+  tillstand.aktuellVy = r.vy;
+  avbrytAI();
+  forstorAllaDiagram();
+  tillstand.vadHandeKontext = null;
+  tillstand.aiPrompt = null;
+  for (const vy of ['start', 'fond', 'jamfor', 'grupper', 'data']) document.getElementById('vy-' + vy).hidden = vy !== r.vy;
+  document.querySelectorAll('[data-flik]').forEach(a => {
+    if (a.dataset.flik === r.vy) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+  });
+  const visaPeriod = (r.vy === 'fond' && r.nr) || r.vy === 'jamfor' || r.vy === 'grupper';
+  document.getElementById('periodrad').hidden = !visaPeriod;
+
+  if (r.vy === 'start') renderStart();
+  else if (r.vy === 'fond') {
+    document.getElementById('fond-sok').hidden = !!r.nr;
+    document.getElementById('fond-detalj').hidden = !r.nr;
+    if (r.nr) renderFondDetalj(r.nr); else renderSokLista();
+  } else if (r.vy === 'jamfor') renderJamfor(r);
+  else if (r.vy === 'grupper') { renderGruppUrval(); renderGrupper(); }
+  else if (r.vy === 'data') renderData();
+
+  uppdateraPeriodtext();
+  if (!forsta && !tyst) {
+    const nav = document.querySelector('.flikar');
+    if (nav.getBoundingClientRect().top < 0) nav.scrollIntoView({ block: 'start', behavior: rorelseAv() ? 'auto' : 'smooth' });
+    fokuseraRubrik();
+  }
+}
+// Flyttar fokus till vyns rubrik, så att skärmläsare läser upp det nya läget.
+function fokuseraRubrik() {
+  const rubrik = [...aktivVy().querySelectorAll('h2')].find(h => h.getClientRects().length > 0);
+  if (rubrik) { rubrik.setAttribute('tabindex', '-1'); rubrik.focus({ preventScroll: true }); }
+}
+// Ritar om den vy som visas (t.ex. när perioden eller temat ändras).
+function ritaOm() { visa(tillstand.aktuellHash, { tyst: true }); }
+
+/* ==========================================================
+   11. PERIODREGLAGE, VARNINGAR OCH TEMA
+   ========================================================== */
+function uppdateraPeriodtext() {
+  const { start, slut } = tillstand.period;
+  document.getElementById('ut-start').textContent = start;
+  document.getElementById('ut-slut').textContent = slut;
+  const n = slut - start + 1;
+  document.getElementById('periodtext').textContent = `Mäter ${arspann(start, slut)} (${n} år). Svaret beror på vilken period man mäter.`;
+}
+function andraPeriod(e) {
+  const s = document.getElementById('period-start'), t = document.getElementById('period-slut');
+  let start = +s.value, slut = +t.value;
+  if (start > slut) { if (e.target === s) slut = start; else start = slut; }
+  s.value = start; t.value = slut;
+  tillstand.period = { start, slut };
+  ritaOm();
+}
+function uppdateraBanderoller() {
+  document.getElementById('varning-exempel').hidden = data().exempeldata !== true;
+  document.getElementById('varning-utkast').hidden = !(tillstand.forhandsgranska && tillstand.utkast);
+  const kalla = tillstand.datakalla === 'fil' ? 'data/fonder.json' : tillstand.datakalla === 'reserv' ? 'reservkopian i index.html' : 'ingen datafil hittades';
+  document.getElementById('datakalla-text').textContent = `Data: ${kalla}${tillstand.forhandsgranska && tillstand.utkast ? ' (utkast från Data-läget visas)' : ''}.`;
+}
+function satForhandsgranskning(pa) {
+  tillstand.forhandsgranska = pa && !!tillstand.utkast;
+  sparaLagrat(FORHANDS_NYCKEL, tillstand.forhandsgranska ? 'ja' : null);
+  uppdateraBanderoller();
+}
+
+/* ==========================================================
+   12. START: koppla knappar och ladda sidan
+   ========================================================== */
+function kopplaHandelser() {
+  // Klick på länkar/knappar med data-ga, data-tillbaka, data-valj-ar och AI-knappar.
+  document.addEventListener('click', e => {
+    const ga = e.target.closest('[data-ga]');
+    if (ga) {
+      if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) return; // öppna i ny flik
+      e.preventDefault(); gaTill(ga.dataset.ga); return;
+    }
+    const bak = e.target.closest('[data-tillbaka]');
+    if (bak) { tillbaka(bak.dataset.tillbaka); return; }
+    const ar = e.target.closest('[data-valj-ar]');
+    if (ar) { valjAr(+ar.dataset.valjAr); return; }
+    const ai = e.target.closest('[data-ai]');
+    if (ai) { if (ai.dataset.ai === 'start') korAI(ai.closest('.ai-panel')); else avbrytAI(); }
+  });
+  window.addEventListener('popstate', () => visa(location.hash.slice(1)));
+
+  document.getElementById('period-start').addEventListener('input', andraPeriod);
+  document.getElementById('period-slut').addEventListener('input', andraPeriod);
+
+  document.getElementById('sokfalt').addEventListener('input', visaSokresultat);
+  document.getElementById('sokform').addEventListener('submit', e => {
+    e.preventDefault();
+    const traff = sokFonder(document.getElementById('sokfalt').value)[0];
+    if (traff) gaTill('fond-' + traff.fond.nr); else visaSokresultat();
+  });
+
+  // Byte i rullistorna ersätter adressen (i stället för ett nytt steg), så att "Tillbaka" går till startsidan.
+  const bytJamforelse = () => {
+    const hash = `jamfor-${document.getElementById('val-index').value}-${document.getElementById('val-esg').value}`;
+    ersattHash(hash);
+    visa(hash, { tyst: true });
+  };
+  document.getElementById('val-index').addEventListener('change', bytJamforelse);
+  document.getElementById('val-esg').addEventListener('change', bytJamforelse);
+  document.getElementById('jamforval').addEventListener('submit', e => e.preventDefault());
+
+  document.getElementById('grupp-urval').addEventListener('change', e => {
+    const nr = +e.target.dataset.urval;
+    if (!nr) return;
+    if (e.target.checked) tillstand.uteslutna.delete(nr); else tillstand.uteslutna.add(nr);
+    uppdateraUrvalRubrik();
+    forstorAllaDiagram();
+    renderGrupper();
+  });
+
+  // Data-läget
+  document.getElementById('dataformular').addEventListener('input', hanteraDataInput);
+  document.getElementById('dataformular').addEventListener('change', e => { if (e.target.tagName === 'SELECT') hanteraDataInput(e); });
+  document.getElementById('arsforklaringar-formular').addEventListener('input', hanteraDataInput);
+  document.getElementById('forhandsgranska').addEventListener('change', e => { sakerstallUtkast(); sparaUtkastSnart(); satForhandsgranskning(e.target.checked); });
+  document.getElementById('kontrollerad').addEventListener('change', e => { tillstand.utkast.exempeldata = !e.target.checked; sparaUtkastSnart(); });
+  document.getElementById('stang-utkast').addEventListener('click', () => { satForhandsgranskning(false); ritaOm(); fokuseraRubrik(); });
+  document.getElementById('visa-json').addEventListener('click', () => {
+    const ut = document.getElementById('json-ut'), status = document.getElementById('exportstatus');
+    if (!kanExportera(status)) return;
+    ut.value = exportJson();
+    ut.hidden = false;
+    status.textContent = 'Här är hela datafilen. Kopiera den och klistra in.';
+  });
+  document.getElementById('kopiera-json').addEventListener('click', async () => {
+    const ut = document.getElementById('json-ut'), status = document.getElementById('exportstatus');
+    if (!kanExportera(status)) return;
+    ut.value = exportJson();
+    ut.hidden = false;
+    try { await navigator.clipboard.writeText(ut.value); status.textContent = 'JSON kopierad. Klistra in den i data/fonder.json och i index.html.'; }
+    catch (e) { ut.focus(); ut.select(); status.textContent = 'Kunde inte kopiera automatiskt. Texten är markerad – tryck Ctrl+C (Cmd+C på Mac).'; }
+  });
+  let rensaTimer = null;
+  document.getElementById('rensa-utkast').addEventListener('click', e => {
+    const knapp = e.currentTarget;
+    if (!knapp.dataset.bekrafta) {
+      knapp.dataset.bekrafta = 'ja'; knapp.textContent = 'Klicka igen för att rensa';
+      rensaTimer = setTimeout(() => { delete knapp.dataset.bekrafta; knapp.textContent = 'Rensa utkast'; }, 4000);
+      return;
+    }
+    clearTimeout(rensaTimer); delete knapp.dataset.bekrafta; knapp.textContent = 'Rensa utkast';
+    clearTimeout(sparTimer); sparTimer = null; // annars kan en väntande sparning skapa utkastet igen
+    sparaLagrat(UTKAST_NYCKEL, null);
+    tillstand.utkast = null; tillstand.utkastBas = null; tillstand.utkastNotis = ''; tillstand.senastSparat = null;
+    satForhandsgranskning(false);
+    renderData();
+    document.getElementById('exportstatus').textContent = 'Utkastet är rensat. Formuläret visar siffrorna från datafilen igen.';
+  });
+
+  // Spara direkt om fliken stängs eller göms, så att den sista ändringen inte försvinner.
+  window.addEventListener('pagehide', () => { if (sparTimer) sparaUtkastNu(); });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && sparTimer) sparaUtkastNu(); });
+  // Ändrades utkastet i en annan flik? Läs in det igen, så att flikarna inte skriver över varandra.
+  window.addEventListener('storage', e => {
+    if (e.key !== UTKAST_NYCKEL) return;
+    lasUtkast(e.newValue);
+    if (!tillstand.utkast) tillstand.forhandsgranska = false;
+    uppdateraBanderoller();
+    if (tillstand.aktuellVy === 'data') {
+      renderData();
+      document.getElementById('sparstatus').textContent = 'Utkastet ändrades i en annan flik och har lästs in här igen.';
+    } else if (tillstand.forhandsgranska) ritaOm();
+  });
+
+  // Rita om graferna när ljust/mörkt läge ändras.
+  if (window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ritaOmGrafer);
+  new MutationObserver(ritaOmGrafer).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+}
+function ritaOmGrafer() { if (Object.keys(diagram).length) ritaOm(); }
+
+async function starta() {
+  kopplaHandelser();
+  if (harChart()) {
+    Chart.defaults.font.family = getComputedStyle(document.body).fontFamily;
+    Chart.defaults.font.size = 12;
+  }
+  await laddaData();
+  uppdateraBanderoller();
+  try { if (!history.state) history.replaceState({ steg: 0 }, ''); } catch (e) { /* ignoreras */ }
+  visa(location.hash.slice(1), { forsta: true });
+  startaAI();
+  // När typsnitten har laddats ritas graferna om med rätt typsnitt.
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => Object.values(diagram).forEach(c => c.update('none')));
+}
+starta();
+</script>
+</body>
+</html>
