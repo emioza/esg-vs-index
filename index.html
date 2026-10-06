@@ -2158,7 +2158,7 @@ function renderData() {
       <li>Skriv årsavkastningen i procent (SEK, efter avgifter) från fondens faktablad. Tomt fält = saknas.</li>
       <li>Allt sparas automatiskt som ett utkast i den här webbläsaren. Det är bara ett arbetsverktyg.</li>
       <li>Tryck <strong>Visa JSON</strong> och <strong>Kopiera JSON</strong>. Klistra in texten i <span class="kod">data/fonder.json</span> och i reservkopian i <span class="kod">index.html</span>.</li>
-      <li>Gör en commit och pusha till GitHub. Då uppdateras sidan.</li>
+      <li>Gör en commit och pusha. Kör sedan <span class="kod">python scripts/publicera.py</span> och pusha repot <span class="kod">esg-vs-index</span> – då uppdateras sidan på nätet (se README).</li>
     </ol>
     <p class="infoplatta">${tillstand.datakalla === 'fil'
       ? 'Sidan läser siffrorna från <span class="kod">data/fonder.json</span>.'
