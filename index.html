@@ -402,7 +402,7 @@ fieldset.faltgrupp legend { font-weight: 700; padding: 0; margin-bottom: .4rem; 
      SIDHUVUD: varningar, rubrik, frågeställning, flikar, period
      ========================================================== -->
 <div class="varningsband" id="varning-exempel" role="status" hidden>
-  <div class="ram"><strong>⚠ Exempelversion – siffror ej kontrollerade</strong><span>Avkastningen är inte ifylld och kontrollerad mot faktabladen än.</span></div>
+  <div class="ram"><strong id="varning-exempel-rubrik">⚠ Exempelversion – siffror ej kontrollerade</strong><span id="varning-exempel-text">Avkastningen är inte ifylld och kontrollerad mot faktabladen än.</span></div>
 </div>
 <div class="varningsband utkast" id="varning-utkast" role="status" hidden>
   <div class="ram"><strong>Utkast visas.</strong><span>Graferna använder siffror från Data-läget som bara finns i den här webbläsaren.</span><button type="button" class="lankknapp" id="stang-utkast">Visa riktiga data igen</button></div>
@@ -565,6 +565,7 @@ fieldset.faltgrupp legend { font-weight: 700; padding: 0; margin-bottom: .4rem; 
 <script type="application/json" id="reservdata">
 {
   "exempeldata": true,
+  "pahittadeSiffror": true,
   "fonder": [
     {
       "nr": 1,
@@ -583,7 +584,7 @@ fieldset.faltgrupp legend { font-weight: 700; padding: 0; margin-bottom: .4rem; 
       "avkastningValuta": "SEK",
       "jamforelseindex": null,
       "sok": ["avanza global", "avanza", "ava global"],
-      "avkastning": {"2019": null, "2020": null, "2021": null, "2022": null, "2023": null, "2024": null},
+      "avkastning": {"2019": 33.1, "2020": 11.8, "2021": 30.2, "2022": -12.4, "2023": 22.9, "2024": 27.6},
       "kalla": "",
       "kallaFil": "kallor/avanza-global.pdf",
       "forklaring": "",
@@ -606,7 +607,7 @@ fieldset.faltgrupp legend { font-weight: 700; padding: 0; margin-bottom: .4rem; 
       "avkastningValuta": "SEK",
       "jamforelseindex": null,
       "sok": ["länsförsäkringar global", "lf global", "lf indexnära", "global indexnära", "länsförsäkringar"],
-      "avkastning": {"2019": null, "2020": null, "2021": null, "2022": null, "2023": null, "2024": null},
+      "avkastning": {"2019": 32.4, "2020": 12.6, "2021": 31.5, "2022": -13.9, "2023": 21.8, "2024": 26.3},
       "kalla": "",
       "kallaFil": "kallor/lf-global-indexnara.pdf",
       "forklaring": "",
@@ -629,7 +630,7 @@ fieldset.faltgrupp legend { font-weight: 700; padding: 0; margin-bottom: .4rem; 
       "avkastningValuta": "SEK",
       "jamforelseindex": null,
       "sok": ["access global", "robur access global", "swedbank access global", "swedbank robur global"],
-      "avkastning": {"2019": null, "2020": null, "2021": null, "2022": null, "2023": null, "2024": null},
+      "avkastning": {"2019": 33.9, "2020": 12.1, "2021": 30.8, "2022": -12, "2023": 23.4, "2024": 28.1},
       "kalla": "",
       "kallaFil": "kallor/robur-access-global.pdf",
       "forklaring": "",
@@ -652,7 +653,7 @@ fieldset.faltgrupp legend { font-weight: 700; padding: 0; margin-bottom: .4rem; 
       "avkastningValuta": "SEK",
       "jamforelseindex": null,
       "sok": ["dnb global", "dnb indeks", "dnb index", "dnb"],
-      "avkastning": {"2019": null, "2020": null, "2021": null, "2022": null, "2023": null, "2024": null},
+      "avkastning": {"2019": 32.7, "2020": 10.9, "2021": 29.6, "2022": -13.1, "2023": 22.1, "2024": 27},
       "kalla": "",
       "kallaFil": "kallor/dnb-global-indeks.pdf",
       "forklaring": "",
@@ -675,7 +676,7 @@ fieldset.faltgrupp legend { font-weight: 700; padding: 0; margin-bottom: .4rem; 
       "avkastningValuta": "SEK",
       "jamforelseindex": "MSCI ACWI",
       "sok": ["storebrand all countries", "global all countries", "all countries", "storebrand acwi"],
-      "avkastning": {"2019": null, "2020": null, "2021": null, "2022": null, "2023": null, "2024": null},
+      "avkastning": {"2019": 30.5, "2020": 13.4, "2021": 27.9, "2022": -11.2, "2023": 19.7, "2024": 24.8},
       "kalla": "",
       "kallaFil": "kallor/storebrand-global-all-countries.pdf",
       "forklaring": "",
@@ -698,7 +699,7 @@ fieldset.faltgrupp legend { font-weight: 700; padding: 0; margin-bottom: .4rem; 
       "avkastningValuta": "SEK",
       "jamforelseindex": "Solactive ISS ESG Screened Paris Aligned Global Markets Index",
       "sok": ["global index criteria", "handelsbanken global index", "hb global index", "hb criteria", "index criteria"],
-      "avkastning": {"2019": null, "2020": null, "2021": null, "2022": null, "2023": null, "2024": null},
+      "avkastning": {"2019": 34.2, "2020": 15.1, "2021": 29.4, "2022": -16.3, "2023": 21.5, "2024": 24.9},
       "kalla": "",
       "kallaFil": "kallor/hb-global-index-criteria.pdf",
       "forklaring": "",
@@ -721,7 +722,7 @@ fieldset.faltgrupp legend { font-weight: 700; padding: 0; margin-bottom: .4rem; 
       "avkastningValuta": "SEK",
       "jamforelseindex": null,
       "sok": ["access edge global", "access edge", "edge global", "robur edge", "swedbank edge"],
-      "avkastning": {"2019": null, "2020": null, "2021": null, "2022": null, "2023": null, "2024": null},
+      "avkastning": {"2019": null, "2020": 13.8, "2021": 31.2, "2022": -15.4, "2023": 22.8, "2024": 25.6},
       "kalla": "",
       "kallaFil": "kallor/robur-access-edge-global.pdf",
       "forklaring": "",
@@ -744,7 +745,7 @@ fieldset.faltgrupp legend { font-weight: 700; padding: 0; margin-bottom: .4rem; 
       "avkastningValuta": "SEK",
       "jamforelseindex": null,
       "sok": ["spp global plus", "storebrand global plus", "global plus", "spp plus", "spp"],
-      "avkastning": {"2019": null, "2020": null, "2021": null, "2022": null, "2023": null, "2024": null},
+      "avkastning": {"2019": 33, "2020": 14.2, "2021": 28.7, "2022": -14.8, "2023": 20.9, "2024": 26.1},
       "kalla": "",
       "kallaFil": "kallor/spp-storebrand-global-plus.pdf",
       "forklaring": "",
@@ -767,7 +768,7 @@ fieldset.faltgrupp legend { font-weight: 700; padding: 0; margin-bottom: .4rem; 
       "avkastningValuta": "SEK",
       "jamforelseindex": null,
       "sok": ["global solutions", "storebrand solutions"],
-      "avkastning": {"2019": null, "2020": null, "2021": null, "2022": null, "2023": null, "2024": null},
+      "avkastning": {"2019": 35.8, "2020": 24.6, "2021": 18.9, "2022": -21.7, "2023": 13.2, "2024": 12.4},
       "kalla": "",
       "kallaFil": "kallor/storebrand-global-solutions.pdf",
       "forklaring": "",
@@ -790,7 +791,7 @@ fieldset.faltgrupp legend { font-weight: 700; padding: 0; margin-bottom: .4rem; 
       "avkastningValuta": "SEK",
       "jamforelseindex": null,
       "sok": ["proethos", "pro ethos", "proethos fond"],
-      "avkastning": {"2019": null, "2020": null, "2021": null, "2022": null, "2023": null, "2024": null},
+      "avkastning": {"2019": 26.4, "2020": 18.3, "2021": 22.1, "2022": -18.6, "2023": 11.9, "2024": 9.7},
       "kalla": "",
       "kallaFil": "kallor/proethos.pdf",
       "forklaring": "",
@@ -813,7 +814,7 @@ fieldset.faltgrupp legend { font-weight: 700; padding: 0; margin-bottom: .4rem; 
       "avkastningValuta": "SEK",
       "jamforelseindex": null,
       "sok": ["nordea klimat", "klimat och miljö", "klimat miljö", "nordea miljö"],
-      "avkastning": {"2019": null, "2020": null, "2021": null, "2022": null, "2023": null, "2024": null},
+      "avkastning": {"2019": 38.1, "2020": 27.9, "2021": 24.3, "2022": -19.2, "2023": 16.5, "2024": 14.8},
       "kalla": "",
       "kallaFil": "kallor/nordea-klimat-och-miljo.pdf",
       "forklaring": "",
@@ -836,7 +837,7 @@ fieldset.faltgrupp legend { font-weight: 700; padding: 0; margin-bottom: .4rem; 
       "avkastningValuta": "SEK",
       "jamforelseindex": "Solactive ISS ESG Screened Global Markets NTR (jan–jun 2024), S&P Global Clean Energy Net TR (från 1 juli 2024)",
       "sok": ["hållbar energi", "hallbar energi", "hb energi", "handelsbanken energi"],
-      "avkastning": {"2019": null, "2020": null, "2021": null, "2022": null, "2023": null, "2024": null},
+      "avkastning": {"2019": 45.6, "2020": 98.3, "2021": -4.2, "2022": -21.8, "2023": -18.7, "2024": -14.9},
       "kalla": "",
       "kallaFil": "kallor/hb-hallbar-energi.pdf",
       "forklaring": "",
@@ -859,7 +860,7 @@ fieldset.faltgrupp legend { font-weight: 700; padding: 0; margin-bottom: .4rem; 
       "avkastningValuta": "EUR",
       "jamforelseindex": "MSCI AC World (EUR) NR",
       "sok": ["bnp", "bnp paribas", "energy transition", "clean energy solutions", "bnp clean energy"],
-      "avkastning": {"2019": null, "2020": null, "2021": null, "2022": null, "2023": null, "2024": null},
+      "avkastning": {"2019": 21.4, "2020": 61.2, "2021": -9.8, "2022": -27.5, "2023": -15.3, "2024": -16.4},
       "kalla": "",
       "kallaFil": "kallor/bnp-clean-energy-solutions.pdf",
       "forklaring": "",
@@ -882,14 +883,21 @@ fieldset.faltgrupp legend { font-weight: 700; padding: 0; margin-bottom: .4rem; 
       "avkastningValuta": "SEK",
       "jamforelseindex": null,
       "sok": ["cb save earth", "save earth", "save earth fund", "cb fond"],
-      "avkastning": {"2019": null, "2020": null, "2021": null, "2022": null, "2023": null, "2024": null},
+      "avkastning": {"2019": 36.9, "2020": 42.5, "2021": 6.8, "2022": -24.1, "2023": -6.2, "2024": -3.5},
       "kalla": "",
       "kallaFil": "kallor/cb-save-earth-fund.pdf",
       "forklaring": "",
       "anmarkning": ""
     }
   ],
-  "arsforklaringar": {"2019": "", "2020": "", "2021": "", "2022": "", "2023": "", "2024": ""},
+  "arsforklaringar": {
+    "2019": "Exempeltext: Börserna steg kraftigt, bland annat för att räntorna var låga.",
+    "2020": "Exempeltext: Coronapandemin fick börserna att rasa i mars, men de återhämtade sig snabbt. Bolag inom förnybar energi steg mycket.",
+    "2021": "Exempeltext: Stark uppgång när ekonomin öppnade igen efter pandemin. Energiaktier som stigit mycket året innan föll tillbaka.",
+    "2022": "Exempeltext: Kriget i Ukraina och snabba räntehöjningar fick börserna att falla, särskilt tillväxtbolag.",
+    "2023": "Exempeltext: Börserna återhämtade sig, med stora teknikbolag och AI i spetsen, medan förnybar energi hade det tufft.",
+    "2024": "Exempeltext: Fortsatt uppgång, främst för amerikanska teknikbolag."
+  },
   "handelser": [
     {"datum": "2020-03", "text": "Covid-kraschen"},
     {"datum": "2022-02", "text": "Ryssland invaderar Ukraina"},
@@ -1097,6 +1105,8 @@ const DATAVARNINGAR = new Set();
 // Städar upp datan: rätt fältordning, alla år finns, tal är tal.
 function stada(d) {
   const ut = { exempeldata: d && d.exempeldata === true, fonder: [], arsforklaringar: {}, handelser: [] };
+  // "pahittadeSiffror": true = påhittade siffror för en prototyp (data/exempel.json). Märks tydligt på sidan.
+  if (d && d.pahittadeSiffror === true) ut.pahittadeSiffror = true;
   for (const f of (d && Array.isArray(d.fonder) ? d.fonder : [])) ut.fonder.push(normaliseraFond(f));
   ut.fonder.sort((a, b) => (a.nr ?? 99) - (b.nr ?? 99));
   for (const ar of AR) ut.arsforklaringar[ar] = String((d && d.arsforklaringar && d.arsforklaringar[ar]) ?? '');
@@ -2165,6 +2175,7 @@ function renderData() {
       : 'Sidan kunde inte läsa <span class="kod">data/fonder.json</span> (det händer när index.html öppnas genom dubbelklick). Den använder därför reservkopian i <span class="kod">index.html</span>.'}</p>
     ${tillstand.reservInaktuell ? '<p class="infoplatta varning"><strong>Reservkopian i index.html är inte samma som data/fonder.json.</strong> Klistra in JSON:en även i index.html, mellan <span class="kod">&lt;script type="application/json" id="reservdata"&gt;</span> och <span class="kod">&lt;/script&gt;</span>.</p>' : ''}
     ${tillstand.utkastNotis ? `<p class="infoplatta varning">${esc(tillstand.utkastNotis)}</p>` : ''}
+    ${data().pahittadeSiffror ? '<p class="infoplatta varning"><strong>Det här är påhittade exempelsiffror (prototyp).</strong> Fyll inte i riktiga siffror här – gör det i projektet, där data/fonder.json har de riktiga siffrorna.</p>' : ''}
     ${DATAVARNINGAR.size ? `<div class="infoplatta varning"><strong>Orimliga värden i datan:</strong><ul>${[...DATAVARNINGAR].map(v => `<li>${esc(v)}</li>`).join('')}</ul></div>` : ''}`;
 
   document.getElementById('forhandsgranska').checked = tillstand.forhandsgranska;
@@ -2373,7 +2384,9 @@ function aiRegler() {
   ].join('\n');
 }
 function aiGemensamt(lista) {
-  const exempel = data().exempeldata ? '\nObs: siffrorna är exempeldata och är inte kontrollerade än.\n' : '';
+  const exempel = data().pahittadeSiffror
+    ? '\nObs: alla siffror nedan är PÅHITTADE exempelsiffror för en prototyp, inte riktiga fondresultat. Säg det tydligt i början av svaret.\n'
+    : data().exempeldata ? '\nObs: siffrorna är exempeldata och är inte kontrollerade än.\n' : '';
   const forklaringar = lista.map(ar => `- ${ar}: ${(data().arsforklaringar[ar] || '').trim() || '(ingen förklaring skriven)'}`).join('\n');
   const handelser = handelserIPeriod(lista).map(h => `- ${h.datumText}: ${h.text}`).join('\n') || '- (inga)';
   return { exempel, forklaringar, handelser };
@@ -2537,10 +2550,16 @@ function andraPeriod(e) {
   ritaOm();
 }
 function uppdateraBanderoller() {
-  document.getElementById('varning-exempel').hidden = data().exempeldata !== true;
+  const pahittat = data().pahittadeSiffror === true;
+  document.getElementById('varning-exempel').hidden = data().exempeldata !== true && !pahittat;
+  document.getElementById('varning-exempel-rubrik').textContent = pahittat
+    ? '⚠ PROTOTYP – påhittade exempelsiffror' : '⚠ Exempelversion – siffror ej kontrollerade';
+  document.getElementById('varning-exempel-text').textContent = pahittat
+    ? 'Siffrorna är inte riktiga fondresultat. De visar bara hur sidan fungerar.'
+    : 'Avkastningen är inte ifylld och kontrollerad mot faktabladen än.';
   document.getElementById('varning-utkast').hidden = !(tillstand.forhandsgranska && tillstand.utkast);
   const kalla = tillstand.datakalla === 'fil' ? 'data/fonder.json' : tillstand.datakalla === 'reserv' ? 'reservkopian i index.html' : 'ingen datafil hittades';
-  document.getElementById('datakalla-text').textContent = `Data: ${kalla}${tillstand.forhandsgranska && tillstand.utkast ? ' (utkast från Data-läget visas)' : ''}.`;
+  document.getElementById('datakalla-text').textContent = `Data: ${kalla}${pahittat ? ' – påhittade exempelsiffror för en prototyp' : ''}${tillstand.forhandsgranska && tillstand.utkast ? ' (utkast från Data-läget visas)' : ''}.`;
 }
 function satForhandsgranskning(pa) {
   tillstand.forhandsgranska = pa && !!tillstand.utkast;
